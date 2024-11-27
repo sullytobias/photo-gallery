@@ -1,35 +1,43 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Suspense, useState } from "react";
+import { CameraControls, Environment } from "@react-three/drei";
 
-import PhotoFrame from "./components/PhotoFrame";
+import MainMenu from "./components/MainMenu";
+import Gallery from "./components/Gallery";
 
-import "./index.scss";
+function App() {
+    const [view, setView] = useState<"menu" | "gallery">("menu");
+    const [currentGallery, setCurrentGallery] = useState<number>(0);
 
-const photos = [
-    {
-        title: "Oaky",
-        file: "/photos/oaky.jpg",
-        position: [0, 0, 0],
-    },
-];
-
-export default function App() {
     return (
-        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-            <color attach="background" args={["#f0f0f0"]} />
-            <ambientLight intensity={2} />
-            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+        <div style={{ height: "100vh", width: "100vw" }}>
+            <Canvas>
+                <Suspense fallback={null}>
+                    <ambientLight intensity={0.5} />
+                    <directionalLight position={[10, 10, 10]} />
 
-            {photos.map((photo, index) => (
-                <PhotoFrame
-                    key={index}
-                    title={photo.title}
-                    file={photo.file}
-                    position={photo.position}
-                />
-            ))}
+                    <CameraControls truckSpeed={0} />
 
-            <OrbitControls />
-        </Canvas>
+                    <Environment background preset="dawn" blur={1} />
+
+                    {view === "menu" && (
+                        <MainMenu
+                            onEnterGallery={(galleryId) => {
+                                setCurrentGallery(galleryId);
+                                setView("gallery");
+                            }}
+                        />
+                    )}
+                    {view === "gallery" && (
+                        <Gallery
+                            galleryId={currentGallery}
+                            onBack={() => setView("menu")}
+                        />
+                    )}
+                </Suspense>
+            </Canvas>
+        </div>
     );
 }
+
+export default App;
