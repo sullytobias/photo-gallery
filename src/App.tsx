@@ -7,7 +7,7 @@ import Gallery from "./components/Gallery";
 
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");
-    const [currentGallery, setCurrentGallery] = useState<number>(0);
+    const [currentGallery, setCurrentGallery] = useState<string>("Urbex");
 
     return (
         <div style={{ height: "100vh", width: "100vw" }}>
@@ -16,7 +16,11 @@ function App() {
                     <ambientLight intensity={0.5} />
                     <directionalLight position={[10, 10, 10]} />
 
-                    <CameraControls truckSpeed={0} />
+                    <CameraControls
+                        truckSpeed={0}
+                        maxDistance={0}
+                        minDistance={5}
+                    />
 
                     <Environment background preset="dawn" blur={1} />
 

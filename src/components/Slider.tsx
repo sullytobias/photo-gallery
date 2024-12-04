@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Text } from "@react-three/drei";
 
 type SliderProps = {
-    onEnterGallery: (galleryId: number) => void;
+    onEnterGallery: (galleryId: string) => void;
 };
 
 const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const galleries = ["Gallery 1", "Gallery 2", "Gallery 3"];
+
+    const galleries = ["Urbex", "Macro", "Landscape"];
 
     const handleNext = () =>
         setCurrentIndex((prev) => (prev + 1) % galleries.length);
@@ -35,7 +36,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
                 </Text>
                 <mesh
                     position={[0, 0, 0]}
-                    onClick={() => onEnterGallery(currentIndex)}
+                    onClick={() => onEnterGallery(galleries[currentIndex])}
                 >
                     <boxGeometry args={[1, 1, 1]} />
                     <meshStandardMaterial color="red" />

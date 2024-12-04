@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import Slider from "./Slider";
 
 type MainMenuProps = {
-    onEnterGallery: (galleryId: number) => void;
+    onEnterGallery: (galleryId: string) => void;
 };
 
 const MainMenu: React.FC<MainMenuProps> = ({ onEnterGallery }) => {

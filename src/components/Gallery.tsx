@@ -1,9 +1,10 @@
 import { useThree } from "@react-three/fiber";
 import { useEffect } from "react";
-import { Vector3 } from "three";
+import { BackSide, Vector3 } from "three";
+import { Text } from "@react-three/drei";
 
 type GalleryProps = {
-    galleryId: number;
+    galleryId: string;
     onBack: () => void;
 };
 
@@ -35,31 +36,51 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
     }, [camera]);
 
     const galleryContent: {
-        [key: number]: { color: string; objects: number };
+        [key: string]: { title: string };
     } = {
-        0: { color: "red", objects: 5 },
-        1: { color: "blue", objects: 3 },
-        2: { color: "green", objects: 7 },
+        Macro: { title: "Macro" },
+        Urbex: { title: "Urbex" },
+        Landscape: { title: "Landscape" },
     };
 
-    const currentGallery = galleryContent[galleryId] || {
-        color: "gray",
-        objects: 1,
-    };
+    const currentGallery = galleryContent[galleryId] || {};
 
     return (
         <group>
-            {Array.from({ length: currentGallery.objects }).map((_, index) => (
-                <mesh key={index} position={[index * 1.5 - 2, 0, 0]}>
-                    <boxGeometry args={[1, 1, 1]} />
-                    <meshStandardMaterial color={currentGallery.color} />
-                </mesh>
-            ))}
-
-            <mesh position={[-2, 2, 0]} onClick={onBack}>
-                <boxGeometry args={[0.5, 0.5, 0.5]} />
-                <meshStandardMaterial color="yellow" />
+            {/* Gallery Box */}
+            <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[10, 10, 10]} />
+                <meshStandardMaterial color="lightgray" side={BackSide} />
             </mesh>
+
+            {/* Title Text */}
+            <Text
+                position={[0, 4.5, 0]}
+                fontSize={0.5}
+                color="black"
+                anchorX="center"
+                anchorY="middle"
+                rotation={[Math.PI / 2, 0, 0]}
+            >
+                {currentGallery.title || "Gallery"}
+            </Text>
+
+            {/* Door */}
+            <mesh position={[0, -3, -4.9]} onClick={onBack}>
+                <planeGeometry args={[2, 4]} />
+                <meshStandardMaterial color="brown" />
+            </mesh>
+
+            {/* Exit Label on the Door */}
+            <Text
+                position={[0, 0, -4.9]}
+                fontSize={0.3}
+                color="black"
+                anchorX="center"
+                anchorY="middle"
+            >
+                Exit
+            </Text>
         </group>
     );
 };
