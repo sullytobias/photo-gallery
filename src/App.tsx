@@ -13,8 +13,12 @@ function App() {
         <div style={{ height: "100vh", width: "100vw" }}>
             <Canvas>
                 <Suspense fallback={null}>
-                    <ambientLight intensity={0.5} />
-                    <directionalLight position={[10, 10, 10]} />
+                    {view !== "gallery" && (
+                        <>
+                            <ambientLight intensity={0.5} />
+                            <directionalLight position={[10, 10, 10]} />
+                        </>
+                    )}
 
                     <CameraControls
                         truckSpeed={0}
@@ -22,7 +26,9 @@ function App() {
                         minDistance={5}
                     />
 
-                    <Environment background preset="dawn" blur={1} />
+                    {view !== "gallery" && (
+                        <Environment background preset="dawn" blur={1} />
+                    )}
 
                     {view === "menu" && (
                         <MainMenu

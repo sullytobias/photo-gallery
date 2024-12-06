@@ -27,7 +27,6 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
                 targetPosition,
                 progress
             );
-            camera.lookAt(0, 0, 0);
 
             if (progress < 1) requestAnimationFrame(animate);
         };
@@ -49,15 +48,22 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
         <group>
             {/* Gallery Box */}
             <mesh position={[0, 0, 0]}>
-                <boxGeometry args={[10, 10, 10]} />
-                <meshStandardMaterial color="lightgray" side={BackSide} />
+                <boxGeometry args={[20, 10, 10]} />
+                <meshStandardMaterial
+                    color="black"
+                    side={BackSide}
+                    emissive="white"
+                    emissiveIntensity={0.02}
+                />
             </mesh>
+
+            <pointLight castShadow position={[0, 0, 0]} power={5000} />
 
             {/* Title Text */}
             <Text
                 position={[0, 4.5, 0]}
                 fontSize={0.5}
-                color="black"
+                color="white"
                 anchorX="center"
                 anchorY="middle"
                 rotation={[Math.PI / 2, 0, 0]}
@@ -68,14 +74,18 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
             {/* Door */}
             <mesh position={[0, -3, -4.9]} onClick={onBack}>
                 <planeGeometry args={[2, 4]} />
-                <meshStandardMaterial color="brown" />
+                <meshStandardMaterial
+                    emissive="white"
+                    emissiveIntensity={0.004}
+                    color="brown"
+                />
             </mesh>
 
             {/* Exit Label on the Door */}
             <Text
                 position={[0, 0, -4.9]}
                 fontSize={0.3}
-                color="black"
+                color="white"
                 anchorX="center"
                 anchorY="middle"
             >
