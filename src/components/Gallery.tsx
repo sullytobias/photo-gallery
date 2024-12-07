@@ -1,7 +1,8 @@
-import { useThree } from "@react-three/fiber";
-import { useEffect } from "react";
-import { BackSide, Vector3 } from "three";
+import React, { useState } from "react";
+import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
+import { BackSide } from "three";
+import Tableau from "./Tableau";
 
 type GalleryProps = {
     galleryId: string;
@@ -9,30 +10,13 @@ type GalleryProps = {
 };
 
 const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
-    const { camera } = useThree();
+    const [targetPosition, setTargetPosition] = useState<
+        [number, number, number]
+    >([0, 2, 5]);
 
-    useEffect(() => {
-        const targetPosition = new Vector3(0, 2, 5);
-        const duration = 1000;
-
-        const start = performance.now();
-        const initialPosition = camera.position.clone();
-
-        const animate = () => {
-            const elapsed = performance.now() - start;
-            const progress = Math.min(elapsed / duration, 1);
-
-            camera.position.lerpVectors(
-                initialPosition,
-                targetPosition,
-                progress
-            );
-
-            if (progress < 1) requestAnimationFrame(animate);
-        };
-
-        animate();
-    }, [camera]);
+    const handleCameraMove = (position: [number, number, number]) => {
+        setTargetPosition(position);
+    };
 
     const galleryContent: {
         [key: string]: { title: string };
@@ -45,7 +29,14 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
     const currentGallery = galleryContent[galleryId] || {};
 
     return (
-        <group>
+        <motion.group
+            animate={{
+                x: -targetPosition[0],
+                y: -targetPosition[1],
+                z: 1,
+            }}
+            transition={{ duration: 1 }}
+        >
             {/* Gallery Box */}
             <mesh position={[0, 0, 0]}>
                 <boxGeometry args={[20, 10, 10]} />
@@ -57,7 +48,40 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
                 />
             </mesh>
 
-            <pointLight castShadow position={[0, 0, 0]} power={5000} />
+            <pointLight position={[0, 0, 0]} power={3500} />
+
+            {/* Tableaux */}
+            <Tableau
+                title="Macro World"
+                position={[-6, 2, -4.9]}
+                handleClick={handleCameraMove}
+            />
+            <Tableau
+                title="Urban Exploration"
+                position={[0, 2, -4.9]}
+                handleClick={handleCameraMove}
+            />
+            <Tableau
+                title="Landscape View"
+                position={[6, 2, -4.9]}
+                handleClick={handleCameraMove}
+            />
+
+            <Tableau
+                title="Macro World"
+                position={[-6, -2, -4.9]}
+                handleClick={handleCameraMove}
+            />
+            <Tableau
+                title="Urban Exploration"
+                position={[0, -2, -4.9]}
+                handleClick={handleCameraMove}
+            />
+            <Tableau
+                title="Landscape View"
+                position={[6, -2, -4.9]}
+                handleClick={handleCameraMove}
+            />
 
             {/* Title Text */}
             <Text
@@ -72,18 +96,20 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
             </Text>
 
             {/* Door */}
-            <mesh position={[0, -3, -4.9]} onClick={onBack}>
+            <mesh position={[0, -3, 4.9]} onClick={onBack}>
                 <planeGeometry args={[2, 4]} />
                 <meshStandardMaterial
                     emissive="white"
                     emissiveIntensity={0.004}
                     color="brown"
+                    side={BackSide}
                 />
             </mesh>
 
             {/* Exit Label on the Door */}
             <Text
-                position={[0, 0, -4.9]}
+                position={[0, 0, 4.9]}
+                rotation={[0, Math.PI, 0]}
                 fontSize={0.3}
                 color="white"
                 anchorX="center"
@@ -91,7 +117,7 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
             >
                 Exit
             </Text>
-        </group>
+        </motion.group>
     );
 };
 
