@@ -1,54 +1,58 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion-3d";
-import { Text } from "@react-three/drei";
+import React from "react";
+import { CameraControls, Text } from "@react-three/drei";
 import { BackSide } from "three";
 import Tableau from "./Tableau";
+import { GalleryType } from "../types/galleries";
 
 type GalleryProps = {
-    galleryId: string;
+    currentGallery: GalleryType;
     onBack: () => void;
+    cameraControls: CameraControls | null;
 };
 
-const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
-    const [targetPosition, setTargetPosition] = useState<
-        [number, number, number]
-    >([0, 2, 5]);
+const Gallery: React.FC<GalleryProps> = ({
+    onBack,
+    currentGallery,
+    cameraControls,
+}) => {
+    const { color, title } = currentGallery;
 
     const handleCameraMove = (position: [number, number, number]) => {
-        setTargetPosition(position);
-    };
+        if (cameraControls) {
+            // Compute a closer position in front of the tableau
+            const closerPosition: [number, number, number] = [
+                position[0], // Maintain the same X position
+                position[1], // Maintain the same Y position
+                position[2], // Move closer along the Z-axis (in front of the tableau)
+            ];
 
-    const galleryContent: {
-        [key: string]: { title: string };
-    } = {
-        Macro: { title: "Macro" },
-        Urbex: { title: "Urbex" },
-        Landscape: { title: "Landscape" },
+            // Update the camera position and target
+            cameraControls.setLookAt(
+                closerPosition[0],
+                closerPosition[1],
+                closerPosition[2], // Camera position (in front of tableau)
+                position[0],
+                position[1],
+                position[2] * 0.3, // Look at the tableau's position
+                true // Smooth transition
+            );
+        }
     };
-
-    const currentGallery = galleryContent[galleryId] || {};
 
     return (
-        <motion.group
-            animate={{
-                x: -targetPosition[0],
-                y: -targetPosition[1],
-                z: 1,
-            }}
-            transition={{ duration: 1 }}
-        >
+        <group>
             {/* Gallery Box */}
             <mesh position={[0, 0, 0]}>
                 <boxGeometry args={[20, 10, 10]} />
                 <meshStandardMaterial
-                    color="black"
+                    color={color}
                     side={BackSide}
-                    emissive="white"
-                    emissiveIntensity={0.02}
+                    emissive={color}
+                    emissiveIntensity={0.05}
                 />
             </mesh>
 
-            <pointLight position={[0, 0, 0]} power={3500} />
+            <pointLight position={[0, 0, 0]} intensity={2} color={color} />
 
             {/* Tableaux */}
             <Tableau
@@ -87,20 +91,20 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
             <Text
                 position={[0, 4.5, 0]}
                 fontSize={0.5}
-                color="white"
+                color={color}
                 anchorX="center"
                 anchorY="middle"
                 rotation={[Math.PI / 2, 0, 0]}
             >
-                {currentGallery.title || "Gallery"}
+                {title || "Gallery"}
             </Text>
 
             {/* Door */}
             <mesh position={[0, -3, 4.9]} onClick={onBack}>
                 <planeGeometry args={[2, 4]} />
                 <meshStandardMaterial
-                    emissive="white"
-                    emissiveIntensity={0.004}
+                    emissive={color}
+                    emissiveIntensity={0.3}
                     color="brown"
                     side={BackSide}
                 />
@@ -111,13 +115,13 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId, onBack }) => {
                 position={[0, 0, 4.9]}
                 rotation={[0, Math.PI, 0]}
                 fontSize={0.3}
-                color="white"
+                color={color}
                 anchorX="center"
                 anchorY="middle"
             >
                 Exit
             </Text>
-        </motion.group>
+        </group>
     );
 };
 

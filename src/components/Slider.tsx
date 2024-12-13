@@ -1,15 +1,17 @@
 import { useState } from "react";
+
 import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
 
+import { GalleriesType } from "../types/galleries";
+
 type SliderProps = {
     onEnterGallery: (galleryId: string) => void;
+    galleries: GalleriesType;
 };
 
-const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
+const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-
-    const galleries = ["Urbex", "Macro", "Landscape"];
 
     const handleNext = () =>
         setCurrentIndex((prev) => (prev + 1) % galleries.length);
@@ -23,7 +25,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
         (currentIndex - 1 + galleries.length) % galleries.length;
 
     return (
-        <motion.group>
+        <motion.group scale={1.4}>
             {/* Left Navigation */}
             <motion.group
                 scale={0.6}
@@ -33,7 +35,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
             >
                 {/* Previous Gallery Title */}
                 <motion.group
-                    key={galleries[getPrevIndex()]}
+                    key={galleries[getPrevIndex()].id}
                     initial={{ scale: 0, x: -1 }}
                     animate={{ scale: 1, x: 0 }}
                     exit={{ scale: 0, x: 0 }}
@@ -43,25 +45,25 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
                         fontSize={0.12}
                         anchorX="center"
                         anchorY="middle"
-                        color="blue"
+                        color="gray"
                     >
-                        {galleries[getPrevIndex()]}
+                        {galleries[getPrevIndex()].title}
                     </Text>
                 </motion.group>
 
                 <mesh position={[0.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                     <cylinderGeometry args={[0.08, 0.08, 1.2, 16]} />
-                    <meshStandardMaterial color="blue" />
+                    <meshStandardMaterial color="darkslategray" />
                 </mesh>
                 <mesh position={[-0.4, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                     <coneGeometry args={[0.2, 0.4, 16]} />
-                    <meshStandardMaterial color="blue" />
+                    <meshStandardMaterial color="darkgray" />
                 </mesh>
             </motion.group>
 
             {/* Main Box */}
             <motion.group
-                key={currentIndex}
+                key={galleries[currentIndex].id}
                 position={[0, 0, 0]}
                 initial={{ scale: 0, y: 1 }}
                 animate={{ scale: 1, y: 0 }}
@@ -74,26 +76,45 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
                     fontSize={0.15}
                     anchorX="center"
                     anchorY="middle"
-                    color="black"
+                    color="white"
                 >
-                    {galleries[currentIndex]}
+                    {galleries[currentIndex].title}
                 </Text>
 
-                {/* Main Gallery Box */}
-                <mesh position={[0, 0, 0]}>
-                    <boxGeometry args={[1, 1, 1]} />
-                    <meshStandardMaterial color="red" />
-                </mesh>
+                {/* House Shape */}
+                <group>
+                    {/* House Base */}
+                    <mesh position={[0, 0, 0]}>
+                        <boxGeometry args={[1, 0.8, 1]} />
+                        <meshStandardMaterial color="dimgray" />
+                    </mesh>
+                    {/* Roof */}
+                    <mesh position={[0, 0.6, 0]} rotation={[0, 183, 0]}>
+                        <coneGeometry args={[0.7, 0.5, 4]} />
+                        <meshStandardMaterial color="darkslategray" />
+                    </mesh>
+                </group>
 
-                {/* Door */}
-                <mesh
-                    onClick={() => onEnterGallery(galleries[currentIndex])}
-                    position={[0, -0.25, 0.51]}
-                    scale={0.2}
+                {/* Glowing Door */}
+                <motion.mesh
+                    onClick={() => onEnterGallery(galleries[currentIndex].id)}
+                    position={[0, -0.2, 0.51]}
+                    animate={{
+                        scale: [0.4, 0.5, 0.4],
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
                 >
-                    <planeGeometry args={[1, 2]} />
-                    <meshStandardMaterial color="white" />
-                </mesh>
+                    <planeGeometry args={[0.4, 0.6]} />
+                    <meshStandardMaterial
+                        color="lightgray"
+                        emissive="white"
+                        emissiveIntensity={2}
+                    />
+                </motion.mesh>
             </motion.group>
 
             {/* Right Navigation */}
@@ -105,7 +126,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
             >
                 {/* Next Gallery Title */}
                 <motion.group
-                    key={galleries[getNextIndex()]}
+                    key={galleries[getNextIndex()].id}
                     initial={{ scale: 0, x: 1 }}
                     animate={{ scale: 1, x: 0 }}
                     exit={{ scale: 0, x: 0 }}
@@ -115,20 +136,20 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery }) => {
                         fontSize={0.12}
                         anchorX="center"
                         anchorY="middle"
-                        color="blue"
+                        color="gray"
                     >
-                        {galleries[getNextIndex()]}
+                        {galleries[getNextIndex()].title}
                     </Text>
                 </motion.group>
 
                 <mesh position={[-0.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                     <cylinderGeometry args={[0.08, 0.08, 1.2, 16]} />
-                    <meshStandardMaterial color="blue" />
+                    <meshStandardMaterial color="darkslategray" />
                 </mesh>
 
                 <mesh position={[0.4, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
                     <coneGeometry args={[0.2, 0.4, 16]} />
-                    <meshStandardMaterial color="blue" />
+                    <meshStandardMaterial color="darkgray" />
                 </mesh>
             </motion.group>
         </motion.group>
