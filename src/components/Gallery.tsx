@@ -19,23 +19,31 @@ const Gallery: React.FC<GalleryProps> = ({
 
     const handleCameraMove = (position: [number, number, number]) => {
         if (cameraControls) {
-            // Compute a closer position in front of the tableau
             const closerPosition: [number, number, number] = [
-                position[0], // Maintain the same X position
-                position[1], // Maintain the same Y position
-                position[2], // Move closer along the Z-axis (in front of the tableau)
+                position[0],
+                position[1],
+                position[2] + 1.5,
             ];
 
-            // Update the camera position and target
             cameraControls.setLookAt(
                 closerPosition[0],
                 closerPosition[1],
-                closerPosition[2], // Camera position (in front of tableau)
+                closerPosition[2],
                 position[0],
                 position[1],
-                position[2] * 0.3, // Look at the tableau's position
-                true // Smooth transition
+                position[2],
+                true
             );
+        }
+    };
+
+    const handleDoorClick = () => {
+        if (cameraControls) {
+            cameraControls.setLookAt(0, -2, 3.5, 0, -3, 4.9, true);
+
+            setTimeout(() => {
+                onBack();
+            }, 1000);
         }
     };
 
@@ -100,7 +108,7 @@ const Gallery: React.FC<GalleryProps> = ({
             </Text>
 
             {/* Door */}
-            <mesh position={[0, -3, 4.9]} onClick={onBack}>
+            <mesh position={[0, -3, 4.9]} onClick={handleDoorClick}>
                 <planeGeometry args={[2, 4]} />
                 <meshStandardMaterial
                     emissive={color}

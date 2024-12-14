@@ -7,6 +7,7 @@ import { GalleryType } from "./types/galleries";
 import MainMenu from "./components/MainMenu";
 import Gallery from "./components/Gallery";
 import { Galleries } from "./const/galleries";
+import { Vector3 } from "three";
 
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");
@@ -16,9 +17,24 @@ function App() {
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
 
-    const setGallery = (galleryId: string) => {
-        const currentG = Galleries.find((g) => g.id === galleryId);
-        setCurrentGallery(currentG || Galleries[0]);
+    const doorPosition = { x: 0, y: -3, z: 4.9 };
+
+    const checkCameraPosition = () => {
+        if (cameraControlsRef.current) {
+            const position = cameraControlsRef.current.getPosition(
+                new Vector3()
+            );
+
+            const distance = Math.sqrt(
+                (position.x - doorPosition.x) ** 2 +
+                    (position.y - doorPosition.y) ** 2 +
+                    (position.z - doorPosition.z) ** 2
+            );
+
+            if (distance < 1) {
+                setView("gallery");
+            }
+        }
     };
 
     return (
@@ -33,7 +49,8 @@ function App() {
                     )}
 
                     <CameraControls
-                        ref={cameraControlsRef} // Pass the ref
+                        ref={cameraControlsRef}
+                        onUpdate={checkCameraPosition}
                         truckSpeed={0}
                         maxDistance={0}
                         minDistance={5}
@@ -47,9 +64,13 @@ function App() {
                         <MainMenu
                             galleries={Galleries}
                             onEnterGallery={(galleryId) => {
-                                setGallery(galleryId);
+                                setCurrentGallery(
+                                    Galleries.find((g) => g.id === galleryId) ||
+                                        Galleries[0]
+                                );
                                 setView("gallery");
                             }}
+                            cameraControls={cameraControlsRef.current}
                         />
                     )}
                     {view === "gallery" && (
