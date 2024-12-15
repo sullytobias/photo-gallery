@@ -1,21 +1,19 @@
 import React from "react";
-import { CameraControls, Text } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { BackSide } from "three";
 import Tableau from "./Tableau";
 import { GalleryType } from "../types/galleries";
+import { useCameraControls } from "../context/cameraControls";
 
 type GalleryProps = {
     currentGallery: GalleryType;
     onBack: () => void;
-    cameraControls: CameraControls | null;
 };
 
-const Gallery: React.FC<GalleryProps> = ({
-    onBack,
-    currentGallery,
-    cameraControls,
-}) => {
+const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
     const { color, title } = currentGallery;
+
+    const { cameraControls } = useCameraControls();
 
     const handleCameraMove = (position: [number, number, number]) => {
         if (cameraControls) {

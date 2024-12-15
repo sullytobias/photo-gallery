@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion-3d";
-import { CameraControls, Text } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { GalleriesType } from "../types/galleries";
 
 type SliderProps = {
     onEnterGallery: (galleryId: string) => void;
     galleries: GalleriesType;
-    cameraControls: CameraControls | null;
 };
 
-const Slider: React.FC<SliderProps> = ({
-    onEnterGallery,
-    galleries,
-    cameraControls,
-}) => {
+const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const handleNext = () =>
@@ -26,18 +21,6 @@ const Slider: React.FC<SliderProps> = ({
     const getNextIndex = () => (currentIndex + 1) % galleries.length;
     const getPrevIndex = () =>
         (currentIndex - 1 + galleries.length) % galleries.length;
-
-    const handleDoorClick = () => {
-        if (cameraControls) {
-            cameraControls.setLookAt(0, 0, 2.5, 0, -0.2, 0.51, true);
-
-            setTimeout(() => {
-                onEnterGallery(galleries[currentIndex].id);
-            }, 1000);
-        } else {
-            onEnterGallery(galleries[currentIndex].id);
-        }
-    };
 
     return (
         <motion.group scale={1.4}>
@@ -112,7 +95,7 @@ const Slider: React.FC<SliderProps> = ({
 
                 {/* Glowing Door */}
                 <motion.mesh
-                    onClick={handleDoorClick}
+                    onClick={() => onEnterGallery(galleries[currentIndex].id)}
                     position={[0, -0.2, 0.51]}
                     animate={{
                         scale: [0.4, 0.5, 0.4],
