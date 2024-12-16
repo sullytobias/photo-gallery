@@ -1,43 +1,58 @@
 import React from "react";
 import { Text } from "@react-three/drei";
 import { BackSide } from "three";
+
 import Tableau from "./Tableau";
-import { GalleryType } from "../types/galleries";
+
+import { type GalleryType } from "../types/galleries";
+import { type TableauType } from "../types/tableau";
+
 import { useCameraControls } from "../context/cameraControls";
+
+import { setCameraView } from "./utils/cameraControls";
 
 type GalleryProps = {
     currentGallery: GalleryType;
     onBack: () => void;
 };
 
+const tableauxData: TableauType[] = [
+    { title: "Macro World", position: [-6, 2, -4.9] },
+    { title: "Urban Exploration", position: [0, 2, -4.9] },
+    { title: "Landscape View", position: [6, 2, -4.9] },
+    { title: "Macro World", position: [-6, -2, -4.9] },
+    { title: "Urban Exploration", position: [0, -2, -4.9] },
+    { title: "Landscape View", position: [6, -2, -4.9] },
+];
+
 const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
     const { color, title } = currentGallery;
 
     const { cameraControls } = useCameraControls();
 
-    const handleCameraMove = (position: [number, number, number]) => {
+    const handleTableauClick = (position: [number, number, number]) => {
         if (cameraControls) {
-            const closerPosition: [number, number, number] = [
-                position[0],
-                position[1],
-                position[2] + 1.5,
-            ];
-
-            cameraControls.setLookAt(
-                closerPosition[0],
-                closerPosition[1],
-                closerPosition[2],
-                position[0],
-                position[1],
-                position[2],
-                true
-            );
+            setCameraView(cameraControls, {
+                positionX: position[0],
+                positionY: position[1],
+                positionZ: position[2] + 1.5,
+                targetX: position[0],
+                targetY: position[1],
+                targetZ: position[2],
+            });
         }
     };
 
     const handleDoorClick = () => {
         if (cameraControls) {
-            cameraControls.setLookAt(0, -2, 3.5, 0, -3, 4.9, true);
+            setCameraView(cameraControls, {
+                positionX: 0,
+                positionY: -2,
+                positionZ: 3.5,
+                targetX: 0,
+                targetY: -3,
+                targetZ: 4.9,
+            });
 
             setTimeout(() => {
                 onBack();
@@ -57,42 +72,17 @@ const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
                     emissiveIntensity={0.05}
                 />
             </mesh>
-
             <pointLight position={[0, 0, 0]} intensity={2} color={color} />
 
             {/* Tableaux */}
-            <Tableau
-                title="Macro World"
-                position={[-6, 2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-            <Tableau
-                title="Urban Exploration"
-                position={[0, 2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-            <Tableau
-                title="Landscape View"
-                position={[6, 2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-
-            <Tableau
-                title="Macro World"
-                position={[-6, -2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-            <Tableau
-                title="Urban Exploration"
-                position={[0, -2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-            <Tableau
-                title="Landscape View"
-                position={[6, -2, -4.9]}
-                handleClick={handleCameraMove}
-            />
-
+            {tableauxData.map((tableau, index) => (
+                <Tableau
+                    key={index}
+                    title={tableau.title}
+                    position={tableau.position}
+                    handleClick={handleTableauClick}
+                />
+            ))}
             {/* Title Text */}
             <Text
                 position={[0, 4.5, 0]}

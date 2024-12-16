@@ -2,7 +2,6 @@ import Slider from "./Slider";
 
 import { GalleriesType } from "../types/galleries";
 
-
 type MainMenuProps = {
     onEnterGallery: (galleryId: string) => void;
     galleries: GalleriesType;

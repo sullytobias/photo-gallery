@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Text } from "@react-three/drei";
+
 import { TextureLoader } from "three";
 
 type TableauProps = {
@@ -17,6 +18,20 @@ const Tableau: React.FC<TableauProps> = ({
     texture,
     handleClick,
 }) => {
+    const textureMap = useMemo(
+        () => (texture ? new TextureLoader().load(texture) : undefined),
+        [texture]
+    );
+
+    const frameSize = size;
+
+    const contentPosition: [number, number, number] = [0, 0, 0.06];
+    const titlePosition: [number, number, number] = [
+        0,
+        -size[1] / 2 - 0.2,
+        0.2,
+    ];
+
     return (
         <group
             position={position}
@@ -26,24 +41,19 @@ const Tableau: React.FC<TableauProps> = ({
         >
             {/* Tableau Frame */}
             <mesh>
-                <boxGeometry args={[size[0], size[1], 0.1]} />
+                <boxGeometry args={[frameSize[0], frameSize[1], 0.1]} />
                 <meshStandardMaterial />
             </mesh>
 
             {/* Tableau Content */}
-            <mesh position={[0, 0, 0.06]}>
-                <planeGeometry args={size} />
-                <meshStandardMaterial
-                    map={
-                        texture ? new TextureLoader().load(texture) : undefined
-                    }
-                    color="black"
-                />
+            <mesh position={contentPosition}>
+                <planeGeometry args={frameSize} />
+                <meshStandardMaterial map={textureMap} color="black" />
             </mesh>
 
             {/* Tableau Title */}
             <Text
-                position={[0, -size[1] / 2 - 0.2, 0.2]}
+                position={titlePosition}
                 fontSize={0.2}
                 color="white"
                 anchorX="center"

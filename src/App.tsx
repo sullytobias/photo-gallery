@@ -1,11 +1,17 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState, useRef } from "react";
 import { CameraControls, Environment } from "@react-three/drei";
+
 import { GalleryType } from "./types/galleries";
+
 import MainMenu from "./components/MainMenu";
 import Gallery from "./components/Gallery";
+import GlobalLights from "./components/lights/global";
+
 import { Galleries } from "./const/galleries";
-import { Vector3 } from "three";
+
+import { setCameraView } from "./components/utils/cameraControls";
+
 import CameraControlsContext from "./context/cameraControls";
 
 function App() {
@@ -15,44 +21,28 @@ function App() {
     );
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
-    const doorPosition = { x: 0, y: -3, z: 4.9 };
-
-    const checkCameraPosition = () => {
-        if (cameraControlsRef.current) {
-            const position = cameraControlsRef.current.getPosition(
-                new Vector3()
-            );
-            const distance = Math.sqrt(
-                (position.x - doorPosition.x) ** 2 +
-                    (position.y - doorPosition.y) ** 2 +
-                    (position.z - doorPosition.z) ** 2
-            );
-
-            if (distance < 1) {
-                setView("gallery");
-            }
-        }
-    };
 
     const handleDoorClick = (galleryId: string) => {
-        if (cameraControlsRef.current) {
-            cameraControlsRef.current.setLookAt(0, 0, 2.5, 0, -0.2, 0.51, true);
+        setCameraView(cameraControlsRef.current, {
+            positionX: 0,
+            positionY: 0,
+            positionZ: 2.5,
+            targetX: 0,
+            targetY: -0.2,
+            targetZ: 0.51,
+        });
 
-            setTimeout(() => {
-                setCurrentGallery(
-                    Galleries.find((g) => g.id === galleryId) || Galleries[0]
-                );
+        setCurrentGallery(
+            Galleries.find((g) => g.id === galleryId) || Galleries[0]
+        );
 
-                setView("gallery");
-            }, 1000);
-        } else {
-            setCurrentGallery(
-                Galleries.find((g) => g.id === galleryId) || Galleries[0]
-            );
-
+        setTimeout(() => {
             setView("gallery");
-        }
+        }, 1000);
     };
+
+    const isGalleryView = view === "gallery";
+    const isMenuView = view === "menu";
 
     return (
         <div style={{ height: "100vh", width: "100vw" }}>
@@ -63,25 +53,19 @@ function App() {
                     <Suspense fallback={null}>
                         <CameraControls
                             ref={cameraControlsRef}
-                            onChange={checkCameraPosition}
                             makeDefault
                             truckSpeed={0}
                             maxDistance={0}
                             minDistance={5}
                         />
 
-                        {view !== "gallery" && (
-                            <>
-                                <ambientLight intensity={0.5} />
-                                <directionalLight position={[10, 10, 10]} />
-                            </>
-                        )}
+                        {!isGalleryView && <GlobalLights />}
 
-                        {view !== "gallery" && (
+                        {!isGalleryView && (
                             <Environment background preset="dawn" blur={1} />
                         )}
 
-                        {view === "menu" && (
+                        {isMenuView && (
                             <MainMenu
                                 galleries={Galleries}
                                 onEnterGallery={(galleryId) =>
@@ -89,7 +73,8 @@ function App() {
                                 }
                             />
                         )}
-                        {view === "gallery" && (
+
+                        {isGalleryView && (
                             <Gallery
                                 currentGallery={currentGallery}
                                 onBack={() => setView("menu")}
