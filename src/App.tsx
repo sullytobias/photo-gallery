@@ -9,6 +9,7 @@ import Gallery from "./components/Gallery";
 import GlobalLights from "./components/lights/global";
 
 import { Galleries } from "./const/galleries";
+import { INITIAL_CAMERA_VIEW } from "./const/camera";
 
 import { setCameraView } from "./components/utils/cameraControls";
 
@@ -21,6 +22,11 @@ function App() {
     );
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
+
+    const handleBackToMenu = () => {
+        setCameraView(cameraControlsRef.current, INITIAL_CAMERA_VIEW);
+        setView("menu");
+    };
 
     const handleDoorClick = (galleryId: string) => {
         setCameraView(cameraControlsRef.current, {
@@ -41,12 +47,35 @@ function App() {
         }, 1000);
     };
 
+    const handleSwitchGallery = (direction: "next" | "prev") => {
+        const currentIndex = Galleries.findIndex(
+            (gallery) => gallery.id === currentGallery.id
+        );
+
+        const nextIndex =
+            direction === "next"
+                ? (currentIndex + 1) % Galleries.length
+                : (currentIndex - 1 + Galleries.length) % Galleries.length;
+
+        const targetGallery = Galleries[nextIndex];
+
+        setCurrentGallery(targetGallery);
+    };
+
     const isGalleryView = view === "gallery";
     const isMenuView = view === "menu";
 
     return (
         <div style={{ height: "100vh", width: "100vw" }}>
-            <Canvas camera={{ position: [0, 2, 5] }}>
+            <Canvas
+                camera={{
+                    position: [
+                        INITIAL_CAMERA_VIEW.positionX,
+                        INITIAL_CAMERA_VIEW.positionY,
+                        INITIAL_CAMERA_VIEW.positionZ,
+                    ],
+                }}
+            >
                 <CameraControlsContext.Provider
                     value={{ cameraControls: cameraControlsRef.current }}
                 >
@@ -76,8 +105,9 @@ function App() {
 
                         {isGalleryView && (
                             <Gallery
+                                onSwitchGallery={handleSwitchGallery}
                                 currentGallery={currentGallery}
-                                onBack={() => setView("menu")}
+                                onBack={handleBackToMenu}
                             />
                         )}
                     </Suspense>

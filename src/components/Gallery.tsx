@@ -14,6 +14,7 @@ import { setCameraView } from "./utils/cameraControls";
 type GalleryProps = {
     currentGallery: GalleryType;
     onBack: () => void;
+    onSwitchGallery: (direction: "next" | "prev") => void;
 };
 
 const tableauxData: TableauType[] = [
@@ -25,8 +26,12 @@ const tableauxData: TableauType[] = [
     { title: "Landscape View", position: [6, -2, -4.9] },
 ];
 
-const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
-    const { color, title } = currentGallery;
+const Gallery: React.FC<GalleryProps> = ({
+    onBack,
+    currentGallery,
+    onSwitchGallery,
+}) => {
+    const { color, title, id } = currentGallery;
 
     const { cameraControls } = useCameraControls();
 
@@ -43,25 +48,12 @@ const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
         }
     };
 
-    const handleDoorClick = () => {
-        if (cameraControls) {
-            setCameraView(cameraControls, {
-                positionX: 0,
-                positionY: -2,
-                positionZ: 3.5,
-                targetX: 0,
-                targetY: -3,
-                targetZ: 4.9,
-            });
-
-            setTimeout(() => {
-                onBack();
-            }, 1000);
-        }
+    const handleDoorClick = (direction: "next" | "prev") => {
+        onSwitchGallery(direction);
     };
 
     return (
-        <group>
+        <group key={id}>
             {/* Gallery Box */}
             <mesh position={[0, 0, 0]}>
                 <boxGeometry args={[20, 10, 10]} />
@@ -95,8 +87,61 @@ const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
                 {title || "Gallery"}
             </Text>
 
-            {/* Door */}
-            <mesh position={[0, -3, 4.9]} onClick={handleDoorClick}>
+            {/* Doors to Other Galleries */}
+            <group>
+                {/* Door to Previous Gallery */}
+                <mesh
+                    position={[-9.9, -3, 0]}
+                    onClick={() => handleDoorClick("prev")}
+                    rotation={[0, -Math.PI / 2, 0]}
+                >
+                    <planeGeometry args={[2, 4]} />
+                    <meshStandardMaterial
+                        emissive={color}
+                        emissiveIntensity={0.3}
+                        color="brown"
+                        side={BackSide}
+                    />
+                </mesh>
+                <Text
+                    position={[-9.8, -3, 0]}
+                    rotation={[0, Math.PI / 2, 0]}
+                    fontSize={0.3}
+                    color="white"
+                    anchorX="center"
+                    anchorY="middle"
+                >
+                    Previous
+                </Text>
+
+                {/* Door to Next Gallery */}
+                <mesh
+                    position={[9.9, -3, 0]}
+                    onClick={() => handleDoorClick("next")}
+                    rotation={[0, Math.PI / 2, 0]}
+                >
+                    <planeGeometry args={[2, 4]} />
+                    <meshStandardMaterial
+                        emissive={color}
+                        emissiveIntensity={0.3}
+                        color="brown"
+                        side={BackSide}
+                    />
+                </mesh>
+                <Text
+                    position={[9.8, -3, 0]}
+                    rotation={[0, -Math.PI / 2, 0]}
+                    fontSize={0.3}
+                    color="white"
+                    anchorX="center"
+                    anchorY="middle"
+                >
+                    Next
+                </Text>
+            </group>
+
+            {/* Exit Door */}
+            <mesh position={[0, -3, 4.9]} onClick={onBack}>
                 <planeGeometry args={[2, 4]} />
                 <meshStandardMaterial
                     emissive={color}
@@ -105,13 +150,11 @@ const Gallery: React.FC<GalleryProps> = ({ onBack, currentGallery }) => {
                     side={BackSide}
                 />
             </mesh>
-
-            {/* Exit Label on the Door */}
             <Text
-                position={[0, 0, 4.9]}
+                position={[0, -3, 4.8]}
                 rotation={[0, Math.PI, 0]}
                 fontSize={0.3}
-                color={color}
+                color="white"
                 anchorX="center"
                 anchorY="middle"
             >

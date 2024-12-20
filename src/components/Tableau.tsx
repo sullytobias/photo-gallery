@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { Text } from "@react-three/drei";
 
+import { type Vector3 } from "@react-three/fiber";
+
 import { TextureLoader } from "three";
 
 type TableauProps = {
@@ -25,12 +27,8 @@ const Tableau: React.FC<TableauProps> = ({
 
     const frameSize = size;
 
-    const contentPosition: [number, number, number] = [0, 0, 0.06];
-    const titlePosition: [number, number, number] = [
-        0,
-        -size[1] / 2 - 0.2,
-        0.2,
-    ];
+    const contentPosition: Vector3 = [0, 0, 0.06];
+    const titlePosition: Vector3 = [0, -size[1] / 2 - 0.2, 0.2];
 
     return (
         <group
