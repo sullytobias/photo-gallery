@@ -26,7 +26,6 @@ const Tableau: React.FC<TableauProps> = ({
     );
 
     const frameSize = size;
-
     const contentPosition: Vector3 = [0, 0, 0.06];
     const titlePosition: Vector3 = [0, -size[1] / 2 - 0.2, 0.2];
 
@@ -37,19 +36,22 @@ const Tableau: React.FC<TableauProps> = ({
                 handleClick([position[0], position[1], position[2] + 5])
             }
         >
-            {/* Tableau Frame */}
+            {/* Frame */}
             <mesh>
                 <boxGeometry args={[frameSize[0], frameSize[1], 0.1]} />
-                <meshStandardMaterial />
+                <meshStandardMaterial color="black" />
             </mesh>
 
-            {/* Tableau Content */}
+            {/* Content */}
             <mesh position={contentPosition}>
                 <planeGeometry args={frameSize} />
-                <meshStandardMaterial map={textureMap} color="black" />
+                <meshStandardMaterial
+                    map={textureMap}
+                    color={textureMap ? "white" : "gray"}
+                />
             </mesh>
 
-            {/* Tableau Title */}
+            {/* Title */}
             <Text
                 position={titlePosition}
                 fontSize={0.2}

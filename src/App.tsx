@@ -23,9 +23,24 @@ function App() {
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
 
-    const handleBackToMenu = () => {
-        setCameraView(cameraControlsRef.current, INITIAL_CAMERA_VIEW);
-        setView("menu");
+    const handleBackToMenu = (position: {
+        x: number;
+        y: number;
+        z: number;
+    }) => {
+        setCameraView(cameraControlsRef.current, {
+            positionX: position.x,
+            positionY: position.y,
+            positionZ: position.z - 2,
+            targetX: position.x,
+            targetY: position.y,
+            targetZ: position.z,
+        });
+
+        setTimeout(() => {
+            setCameraView(cameraControlsRef.current, INITIAL_CAMERA_VIEW);
+            setView("menu");
+        }, 800);
     };
 
     const handleDoorClick = (galleryId: string) => {
@@ -44,22 +59,45 @@ function App() {
 
         setTimeout(() => {
             setView("gallery");
-        }, 1000);
+        }, 800);
     };
 
-    const handleSwitchGallery = (direction: "next" | "prev") => {
+    const handleSwitchGallery = (
+        direction: "next" | "prev",
+        position: { x: number; y: number; z: number }
+    ) => {
         const currentIndex = Galleries.findIndex(
             (gallery) => gallery.id === currentGallery.id
         );
 
-        const nextIndex =
-            direction === "next"
-                ? (currentIndex + 1) % Galleries.length
-                : (currentIndex - 1 + Galleries.length) % Galleries.length;
+        const isNext = direction === "next";
+
+        const nextIndex = isNext
+            ? (currentIndex + 1) % Galleries.length
+            : (currentIndex - 1 + Galleries.length) % Galleries.length;
 
         const targetGallery = Galleries[nextIndex];
 
-        setCurrentGallery(targetGallery);
+        setCameraView(cameraControlsRef.current, {
+            positionX: position.x - (isNext ? 2 : -2),
+            positionY: position.y,
+            positionZ: position.z,
+            targetX: position.x,
+            targetY: position.y,
+            targetZ: position.z,
+        });
+
+        setTimeout(() => {
+            setCurrentGallery(targetGallery);
+            setCameraView(cameraControlsRef.current, {
+                positionX: 0,
+                positionY: 0,
+                positionZ: 2.5,
+                targetX: 0,
+                targetY: -0.2,
+                targetZ: 0.51,
+            });
+        }, 800);
     };
 
     const isGalleryView = view === "gallery";
@@ -84,7 +122,7 @@ function App() {
                             ref={cameraControlsRef}
                             makeDefault
                             truckSpeed={0}
-                            maxDistance={0}
+                            maxDistance={5}
                             minDistance={5}
                         />
 

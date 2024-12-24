@@ -13,12 +13,19 @@ import { setCameraView } from "./utils/cameraControls";
 
 type GalleryProps = {
     currentGallery: GalleryType;
-    onBack: () => void;
-    onSwitchGallery: (direction: "next" | "prev") => void;
+    onBack: (position: { x: number; y: number; z: number }) => void;
+    onSwitchGallery: (
+        direction: "next" | "prev",
+        position: { x: number; y: number; z: number }
+    ) => void;
 };
 
 const tableauxData: TableauType[] = [
-    { title: "Macro World", position: [-6, 2, -4.9] },
+    {
+        title: "Macro World",
+        position: [-6, 2, -4.9],
+        content: "/photos/oaky.jpg",
+    },
     { title: "Urban Exploration", position: [0, 2, -4.9] },
     { title: "Landscape View", position: [6, 2, -4.9] },
     { title: "Macro World", position: [-6, -2, -4.9] },
@@ -37,10 +44,18 @@ const Gallery: React.FC<GalleryProps> = ({
 
     const handleTableauClick = (position: [number, number, number]) => {
         if (cameraControls) {
+            const closestOffset = 0.1;
+
+            const cameraPosition = [
+                position[0],
+                position[1],
+                position[2] + closestOffset,
+            ];
+
             setCameraView(cameraControls, {
-                positionX: position[0],
-                positionY: position[1],
-                positionZ: position[2] + 1.5,
+                positionX: cameraPosition[0],
+                positionY: cameraPosition[1],
+                positionZ: cameraPosition[2],
                 targetX: position[0],
                 targetY: position[1],
                 targetZ: position[2],
@@ -48,8 +63,11 @@ const Gallery: React.FC<GalleryProps> = ({
         }
     };
 
-    const handleDoorClick = (direction: "next" | "prev") => {
-        onSwitchGallery(direction);
+    const handleDoorClick = (
+        direction: "next" | "prev",
+        position: { x: number; y: number; z: number }
+    ) => {
+        onSwitchGallery(direction, position);
     };
 
     return (
@@ -64,13 +82,17 @@ const Gallery: React.FC<GalleryProps> = ({
                     emissiveIntensity={0.05}
                 />
             </mesh>
-            <pointLight position={[0, 0, 0]} intensity={2} color={color} />
+
+            <pointLight position={[0, 0, 0]} intensity={30} />
+            <pointLight position={[-5, 0, 0]} intensity={30} />
+            <pointLight position={[5, 0, 0]} intensity={30} />
 
             {/* Tableaux */}
             {tableauxData.map((tableau, index) => (
                 <Tableau
                     key={index}
                     title={tableau.title}
+                    texture={tableau.content}
                     position={tableau.position}
                     handleClick={handleTableauClick}
                 />
@@ -79,7 +101,7 @@ const Gallery: React.FC<GalleryProps> = ({
             <Text
                 position={[0, 4.5, 0]}
                 fontSize={0.5}
-                color={color}
+                color="white"
                 anchorX="center"
                 anchorY="middle"
                 rotation={[Math.PI / 2, 0, 0]}
@@ -92,7 +114,9 @@ const Gallery: React.FC<GalleryProps> = ({
                 {/* Door to Previous Gallery */}
                 <mesh
                     position={[-9.9, -3, 0]}
-                    onClick={() => handleDoorClick("prev")}
+                    onClick={() =>
+                        handleDoorClick("prev", { x: -9.9, y: -3, z: 0 })
+                    }
                     rotation={[0, -Math.PI / 2, 0]}
                 >
                     <planeGeometry args={[2, 4]} />
@@ -117,7 +141,9 @@ const Gallery: React.FC<GalleryProps> = ({
                 {/* Door to Next Gallery */}
                 <mesh
                     position={[9.9, -3, 0]}
-                    onClick={() => handleDoorClick("next")}
+                    onClick={() =>
+                        handleDoorClick("next", { x: 9.9, y: -3, z: 0 })
+                    }
                     rotation={[0, Math.PI / 2, 0]}
                 >
                     <planeGeometry args={[2, 4]} />
@@ -141,7 +167,10 @@ const Gallery: React.FC<GalleryProps> = ({
             </group>
 
             {/* Exit Door */}
-            <mesh position={[0, -3, 4.9]} onClick={onBack}>
+            <mesh
+                position={[0, -3, 4.9]}
+                onClick={() => onBack({ x: 0, y: -3, z: 4.9 })}
+            >
                 <planeGeometry args={[2, 4]} />
                 <meshStandardMaterial
                     emissive={color}

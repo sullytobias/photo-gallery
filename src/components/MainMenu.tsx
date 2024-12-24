@@ -7,8 +7,8 @@ type MainMenuProps = {
     galleries: GalleriesType;
 };
 
-const MainMenu: React.FC<MainMenuProps> = ({ onEnterGallery, galleries }) => {
-    return <Slider onEnterGallery={onEnterGallery} galleries={galleries} />;
-};
+const MainMenu: React.FC<MainMenuProps> = ({ onEnterGallery, galleries }) => (
+    <Slider onEnterGallery={onEnterGallery} galleries={galleries} />
+);
 
 export default MainMenu;
