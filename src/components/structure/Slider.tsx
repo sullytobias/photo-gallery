@@ -1,25 +1,24 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+
 import { motion } from "framer-motion-3d";
+
 import { Text } from "@react-three/drei";
 
-import { GalleriesType } from "../types/galleries";
+import { SliderProps } from "../../types/slider";
 
-type SliderProps = {
-    onEnterGallery: (galleryId: string) => void;
-    galleries: GalleriesType;
-};
+import { Galleries } from "../../const/galleries";
 
-const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
+const Slider = ({ onEnterGallery }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextIndex = useMemo(
-        () => (currentIndex + 1) % galleries.length,
-        [currentIndex, galleries.length]
+        () => (currentIndex + 1) % Galleries.length,
+        [currentIndex]
     );
 
     const prevIndex = useMemo(
-        () => (currentIndex - 1 + galleries.length) % galleries.length,
-        [currentIndex, galleries.length]
+        () => (currentIndex - 1 + Galleries.length) % Galleries.length,
+        [currentIndex]
     );
 
     const handleNext = () => setCurrentIndex(nextIndex);
@@ -102,13 +101,13 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
             <NavButton
                 position={[-1.3, 0, 0]}
                 onClick={handlePrev}
-                title={galleries[prevIndex].title}
+                title={Galleries[prevIndex].title}
                 direction="left"
             />
 
             {/* Main Box */}
             <motion.group
-                key={galleries[currentIndex].id}
+                key={Galleries[currentIndex].id}
                 position={[0, 0, 0]}
                 {...motionProps}
             >
@@ -119,7 +118,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
                     anchorX="center"
                     anchorY="middle"
                 >
-                    {galleries[currentIndex].title}
+                    {Galleries[currentIndex].title}
                 </Text>
 
                 {/* House Shape */}
@@ -138,7 +137,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
                 <motion.mesh
                     position={[0, -0.2, 0.51]}
                     {...glowingDoorAnimation}
-                    onClick={() => onEnterGallery(galleries[currentIndex].id)}
+                    onClick={() => onEnterGallery(Galleries[currentIndex].id)}
                 >
                     <planeGeometry args={[0.4, 0.6]} />
                     <meshStandardMaterial
@@ -153,7 +152,7 @@ const Slider: React.FC<SliderProps> = ({ onEnterGallery, galleries }) => {
             <NavButton
                 position={[1.3, 0, 0]}
                 onClick={handleNext}
-                title={galleries[nextIndex].title}
+                title={Galleries[nextIndex].title}
                 direction="right"
             />
         </motion.group>

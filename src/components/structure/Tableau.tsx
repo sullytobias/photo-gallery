@@ -1,25 +1,18 @@
-import React, { useMemo } from "react";
-import { Text } from "@react-three/drei";
+import { useMemo } from "react";
 
+import { Text } from "@react-three/drei";
 import { type Vector3 } from "@react-three/fiber";
 
 import { TextureLoader } from "three";
+import { TableauProps } from "../../types/tableau";
 
-type TableauProps = {
-    title: string;
-    position: [number, number, number];
-    size?: [number, number];
-    texture?: string;
-    handleClick: (position: [number, number, number]) => void;
-};
-
-const Tableau: React.FC<TableauProps> = ({
+const Tableau = ({
     title,
     position,
     size = [2.5, 1.5],
     texture,
     handleClick,
-}) => {
+}: TableauProps) => {
     const textureMap = useMemo(
         () => (texture ? new TextureLoader().load(texture) : undefined),
         [texture]

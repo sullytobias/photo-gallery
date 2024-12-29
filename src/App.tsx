@@ -1,15 +1,20 @@
-import { Canvas } from "@react-three/fiber";
 import { Suspense, useState, useRef } from "react";
-import { CameraControls, Environment } from "@react-three/drei";
+
+import { Canvas } from "@react-three/fiber";
+import { CameraControls } from "@react-three/drei";
 
 import { GalleryType } from "./types/galleries";
 
-import MainMenu from "./components/MainMenu";
-import Gallery from "./components/Gallery";
-import GlobalLights from "./components/lights/global";
+import MainMenu from "./components/structure/MainMenu";
+import Gallery from "./components/structure/Gallery";
 
-import { Galleries } from "./const/galleries";
-import { INITIAL_CAMERA_VIEW } from "./const/camera";
+import {
+    EXIT_DOOR_POSITION,
+    Galleries,
+    NEXT_DOOR_POSITION,
+    PREV_DOOR_POSITION,
+} from "./const/galleries";
+import { INITIAL_CAMERA_VIEW, INITIAL_GALLERY_VIEW } from "./const/camera";
 
 import { setCameraView } from "./components/utils/cameraControls";
 
@@ -23,11 +28,9 @@ function App() {
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
 
-    const handleBackToMenu = (position: {
-        x: number;
-        y: number;
-        z: number;
-    }) => {
+    const handleBackToMenu = () => {
+        const position = EXIT_DOOR_POSITION;
+
         setCameraView(cameraControlsRef.current, {
             positionX: position.x,
             positionY: position.y,
@@ -44,14 +47,7 @@ function App() {
     };
 
     const handleDoorClick = (galleryId: string) => {
-        setCameraView(cameraControlsRef.current, {
-            positionX: 0,
-            positionY: 0,
-            positionZ: 2.5,
-            targetX: 0,
-            targetY: -0.2,
-            targetZ: 0.51,
-        });
+        setCameraView(cameraControlsRef.current, INITIAL_GALLERY_VIEW);
 
         setCurrentGallery(
             Galleries.find((g) => g.id === galleryId) || Galleries[0]
@@ -62,15 +58,13 @@ function App() {
         }, 800);
     };
 
-    const handleSwitchGallery = (
-        direction: "next" | "prev",
-        position: { x: number; y: number; z: number }
-    ) => {
+    const handleSwitchGallery = (direction: "next" | "prev") => {
         const currentIndex = Galleries.findIndex(
             (gallery) => gallery.id === currentGallery.id
         );
 
         const isNext = direction === "next";
+        const position = isNext ? NEXT_DOOR_POSITION : PREV_DOOR_POSITION;
 
         const nextIndex = isNext
             ? (currentIndex + 1) % Galleries.length
@@ -89,14 +83,7 @@ function App() {
 
         setTimeout(() => {
             setCurrentGallery(targetGallery);
-            setCameraView(cameraControlsRef.current, {
-                positionX: 0,
-                positionY: 0,
-                positionZ: 2.5,
-                targetX: 0,
-                targetY: -0.2,
-                targetZ: 0.51,
-            });
+            setCameraView(cameraControlsRef.current, INITIAL_GALLERY_VIEW);
         }, 800);
     };
 
@@ -126,15 +113,8 @@ function App() {
                             minDistance={5}
                         />
 
-                        {!isGalleryView && <GlobalLights />}
-
-                        {!isGalleryView && (
-                            <Environment background preset="dawn" blur={1} />
-                        )}
-
                         {isMenuView && (
                             <MainMenu
-                                galleries={Galleries}
                                 onEnterGallery={(galleryId) =>
                                     handleDoorClick(galleryId)
                                 }
