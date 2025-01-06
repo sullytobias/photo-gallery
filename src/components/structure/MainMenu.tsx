@@ -8,7 +8,7 @@ import GlobalLights from "../lights/global";
 
 const MainMenu = ({ onEnterGallery }: MainMenuProps) => (
     <group>
-        <Environment background preset="dawn" blur={1} />
+        <Environment background preset="night" blur={1} />
 
         <GlobalLights />
 

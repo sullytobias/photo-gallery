@@ -1,17 +1,11 @@
-import { useMemo } from "react";
-
+import React from "react";
 import { Text } from "@react-three/drei";
-
 import { BackSide } from "three";
 
 import Tableau from "./Tableau";
-
 import Door from "../atoms/Door";
-
 import { useCameraControls } from "../../context/cameraControls";
-
 import { setCameraView } from "../utils/cameraControls";
-
 import GalleryLights from "../lights/gallery";
 
 import {
@@ -25,23 +19,33 @@ import { GalleryProps } from "../../types/galleries";
 import { type TableauType } from "../../types/tableau";
 
 const tableauxData: TableauType[] = [
-    {
-        title: "Macro World",
-        position: [-6, 2, -4.9],
-        content: "/photos/oaky.jpg",
-    },
-    { title: "Urban Exploration", position: [0, 2, -4.9] },
-    { title: "Landscape View", position: [6, 2, -4.9] },
-    { title: "Macro World", position: [-6, -2, -4.9] },
-    { title: "Urban Exploration", position: [0, -2, -4.9] },
-    { title: "Landscape View", position: [6, -2, -4.9] },
+    { title: "Abstract", position: [-6, 3, -4.9], content: "/photos/oaky.jpg" },
+    { title: "Abstract", position: [-3, 3, -4.9] },
+    { title: "Abstract", position: [0, 3, -4.9] },
+    { title: "Night Sky", position: [3, 3, -4.9] },
+    { title: "Seascape", position: [6, 3, -4.9] },
+    { title: "Forest Trails", position: [-6, 1, -4.9] },
+    { title: "Abstract Colors", position: [-3, 1, -4.9] },
+    { title: "Mountains", position: [0, 1, -4.9] },
+    { title: "City Lights", position: [3, 1, -4.9] },
+    { title: "Wildlife", position: [6, 1, -4.9] },
+    { title: "Vintage Art", position: [-6, -1, -4.9] },
+    { title: "Ocean Depths", position: [-3, -1, -4.9] },
+    { title: "Autumn Leaves", position: [0, -1, -4.9] },
+    { title: "Desert Sands", position: [3, -1, -4.9] },
+    { title: "Rainforest", position: [6, -1, -4.9] },
+    { title: "Evening Glow", position: [-6, -3, -4.9] },
+    { title: "Snow Peaks", position: [-3, -3, -4.9] },
+    { title: "River Flow", position: [0, -3, -4.9] },
+    { title: "Cherry Blossoms", position: [3, -3, -4.9] },
+    { title: "Starry Night", position: [6, -3, -4.9] },
 ];
 
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;
     const { cameraControls } = useCameraControls();
 
-    const currentIndex = useMemo(
+    const currentIndex = React.useMemo(
         () => Galleries.findIndex((gallery) => gallery.id === id),
         [id]
     );
