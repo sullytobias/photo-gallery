@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import { Text } from "@react-three/drei";
 import { BackSide } from "three";
 
@@ -40,8 +41,6 @@ const tableauxData: TableauType[] = [
     { title: "Cherry Blossoms", position: [3, -3, -4.9] },
     { title: "Starry Night", position: [6, -3, -4.9] },
 ];
-
-import { useState } from "react";
 
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;
@@ -100,7 +99,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     handleClick={handleTableauClick}
                     handleEtiquetteClick={handleEtiquetteClick}
                     isFocused={focusedTableau === index}
-                    tableauKey={index} // Pass the key here
+                    tableauKey={index}
                 />
             ))}
 
@@ -113,7 +112,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                 anchorY="middle"
                 rotation={[Math.PI / 2, 0, 0]}
             >
-                {title || "Gallery"}
+                {title || "GALLERY"}
             </Text>
 
             {/* Navigation Doors */}
@@ -152,7 +151,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     isFrontSide
                     placeTextWithZAxis
                     color={color}
-                    text="Exit"
+                    text="EXIT"
                 />
             </group>
         </group>

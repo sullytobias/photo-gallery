@@ -87,49 +87,63 @@ const NavButton = ({
     );
 };
 
-const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => (
-    <motion.group
-        key={Galleries[currentIndex].id}
-        position={[0, 0, 0]}
-        {...motionProps}
-    >
-        <Text
-            position={[0, 0.3, 0.51]}
-            fontSize={0.15}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-        >
-            {Galleries[currentIndex].title}
-        </Text>
+const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-        {/* House Shape */}
-        <group>
-            <mesh position={[0, 0, 0]}>
-                <boxGeometry args={[1, 0.8, 1]} />
-                <meshStandardMaterial color="dimgray" />
-            </mesh>
-            <mesh position={[0, 0.6, 0]} rotation={[0, 183, 0]}>
-                <coneGeometry args={[0.7, 0.5, 4]} />
-                <meshStandardMaterial color="darkslategray" />
-            </mesh>
-        </group>
+    const onEnterGalleryHandler = (id: string) => {
+        setIsOpen(true);
+        onEnterGallery(id);
+    };
 
-        {/* Glowing Door */}
-        <motion.mesh
-            position={[0, -0.2, 0.51]}
-            {...glowingDoorAnimation}
-            onClick={() => onEnterGallery(Galleries[currentIndex].id)}
+    return (
+        <motion.group
+            key={Galleries[currentIndex].id}
+            position={[0, 0, 0]}
+            {...motionProps}
         >
-            <planeGeometry args={[0.4, 0.6]} />
-            <meshStandardMaterial
-                color="lightgray"
-                emissive="white"
-                emissiveIntensity={2}
-            />
-        </motion.mesh>
-    </motion.group>
-);
+            <Text
+                position={[0, 0.3, 0.51]}
+                fontSize={0.15}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+            >
+                {Galleries[currentIndex].title}
+            </Text>
+
+            {/* House Shape */}
+            <group>
+                <mesh position={[0, 0, 0]}>
+                    <boxGeometry args={[1, 0.8, 1]} />
+                    <meshStandardMaterial color="dimgray" />
+                </mesh>
+                <mesh position={[0, 0.6, 0]} rotation={[0, 183, 0]}>
+                    <coneGeometry args={[0.7, 0.5, 4]} />
+                    <meshStandardMaterial color="darkslategray" />
+                </mesh>
+            </group>
+
+            {/* Glowing Door */}
+            <motion.mesh
+                position={[0, -0.2, 0.51]}
+                {...glowingDoorAnimation}
+                onClick={() =>
+                    onEnterGalleryHandler(Galleries[currentIndex].id)
+                }
+            >
+                <planeGeometry args={[0.4, 0.6]} />
+                <motion.meshStandardMaterial
+                    animate={{
+                        color: isOpen ? "#000" : "#fff",
+                    }}
+                    transition={{
+                        duration: 0.8,
+                    }}
+                />
+            </motion.mesh>
+        </motion.group>
+    );
+};
 
 const Slider = ({ onEnterGallery }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);

@@ -1,9 +1,9 @@
 import { GalleriesType } from "../types/galleries";
 
 export const Galleries: GalleriesType = [
-    { id: "macro", title: "Macro", color: "#ff5722" },
-    { id: "urbex", title: "Urbex", color: "#3f51b5" },
-    { id: "lanscape", title: "Landscape", color: "#4caf50" },
+    { id: "macro", title: "MACRO", color: "#a0522d" }, // Muted sienna for a subtle earthy feel
+    { id: "urbex", title: "URBEX", color: "#37474f" }, // Keeping the urban-industrial dark gray-blue
+    { id: "landscape", title: "LANDSCAPES", color: "#556b2f" }, // Deep forest green for a serene natural tone
 ];
 
 export const NEXT_DOOR_POSITION = { x: 9.9, y: -3, z: 0 };

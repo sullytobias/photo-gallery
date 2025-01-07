@@ -12,6 +12,8 @@ export type DoorType = {
 export type DoorPanelType = {
     color: string;
     isFrontSide?: boolean;
+    isOpen: boolean;
+    rotation?: [number, number, number];
 };
 
 export type FrameType = {
@@ -25,4 +27,5 @@ export type TextType = {
     rotation?: [number, number, number];
     placeTextWithZAxis?: boolean;
     operator?: string;
+    isOpen?: boolean;
 };
