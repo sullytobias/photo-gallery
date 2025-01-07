@@ -11,4 +11,7 @@ export type TableauProps = {
     size?: [number, number];
     texture?: string;
     handleClick: (position: [number, number, number]) => void;
+    handleEtiquetteClick: (index: number) => void;
+    isFocused: boolean;
+    tableauKey: number;
 };

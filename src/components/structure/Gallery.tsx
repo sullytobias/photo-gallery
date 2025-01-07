@@ -19,7 +19,7 @@ import { GalleryProps } from "../../types/galleries";
 import { type TableauType } from "../../types/tableau";
 
 const tableauxData: TableauType[] = [
-    { title: "Abstract", position: [-6, 3, -4.9], content: "/photos/oaky.jpg" },
+    { title: "Abstract", position: [-6, 3, -4.9] },
     { title: "Abstract", position: [-3, 3, -4.9] },
     { title: "Abstract", position: [0, 3, -4.9] },
     { title: "Night Sky", position: [3, 3, -4.9] },
@@ -41,9 +41,13 @@ const tableauxData: TableauType[] = [
     { title: "Starry Night", position: [6, -3, -4.9] },
 ];
 
+import { useState } from "react";
+
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;
     const { cameraControls } = useCameraControls();
+
+    const [focusedTableau, setFocusedTableau] = useState<number | null>(null);
 
     const currentIndex = React.useMemo(
         () => Galleries.findIndex((gallery) => gallery.id === id),
@@ -67,6 +71,8 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
             });
         }
     };
+
+    const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
 
     return (
         <group key={id}>
@@ -92,6 +98,9 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     texture={content}
                     position={position}
                     handleClick={handleTableauClick}
+                    handleEtiquetteClick={handleEtiquetteClick}
+                    isFocused={focusedTableau === index}
+                    tableauKey={index} // Pass the key here
                 />
             ))}
 

@@ -3,7 +3,7 @@ import { Text } from "@react-three/drei";
 import { type Vector3 } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { TableauProps } from "../../types/tableau";
-import { motion } from "framer-motion-3d"; // Import from framer-motion-3d
+import { motion } from "framer-motion-3d";
 
 const Tableau = ({
     title,
@@ -11,6 +11,9 @@ const Tableau = ({
     size = [2.5, 1.5],
     texture,
     handleClick,
+    handleEtiquetteClick,
+    isFocused,
+    tableauKey,
 }: TableauProps) => {
     const [showDescription, setShowDescription] = useState(false);
 
@@ -21,17 +24,22 @@ const Tableau = ({
 
     const frameSize = size;
     const contentPosition: Vector3 = [0, 0, 0.06];
-
-    // Adjust the position to place the etiquette at the bottom right
     const titlePosition: Vector3 = [
-        size[0] / 2 - 0.25, // Offset to the right side
-        -size[1] / 2 + 0.1, // Offset to the bottom
+        size[0] / 2 - 0.25,
+        -size[1] / 2 + 0.1,
         0.1,
     ];
 
-    const toggleDescription = () => {
+    const toggleDescription = (index: number) => {
         setShowDescription(!showDescription);
+        handleEtiquetteClick(index);
     };
+
+    const maxTitleLength = 8;
+    const truncatedTitle =
+        title.length > maxTitleLength
+            ? `${title.substring(0, maxTitleLength)}...`
+            : title;
 
     return (
         <group
@@ -57,59 +65,55 @@ const Tableau = ({
                 />
             </mesh>
 
-            {/* Title as an Etiquette at Bottom Right */}
-            <group position={titlePosition} onClick={toggleDescription}>
+            {/* Title */}
+            <group
+                position={titlePosition}
+                onClick={() => toggleDescription(tableauKey)}
+            >
                 <mesh>
                     <planeGeometry args={[0.5, 0.2]} />
-                    <meshStandardMaterial
-                        transparent
-                        opacity={0.7}
-                        color="wheat"
-                    />
+                    <meshStandardMaterial color="wheat" />
                 </mesh>
                 <Text
-                    position={[0, 0, 0.06]}
-                    fontSize={0.1}
+                    position={[0, 0, 0.01]}
+                    fontSize={0.08}
                     color="black"
                     anchorX="center"
                     anchorY="middle"
                 >
-                    {title}
+                    {truncatedTitle}
                 </Text>
             </group>
 
             {/* Description */}
-            <motion.group
-                initial={{ scale: 0 }}
-                animate={{
-                    scale: showDescription ? 1 : 0,
-                }}
-                exit={{ scale: 0 }}
-                transition={{
-                    duration: 0.6,
-                    ease: "easeInOut",
-                }}
-            >
+            <motion.group>
                 <mesh position={[0, 0, 0.1]}>
                     <planeGeometry args={frameSize} />
-                    <meshStandardMaterial
+                    <motion.meshStandardMaterial
+                        initial={{ opacity: 0 }}
+                        animate={{
+                            opacity: showDescription && isFocused ? 0.7 : 0,
+                        }}
+                        transition={{ duration: 0.6 }}
                         color="wheat"
-                        opacity={0.7}
                         transparent
                     />
                 </mesh>
-                <Text
-                    position={[0, 0, 0.2]}
-                    fontSize={0.1}
-                    color="white"
-                    anchorX="center"
-                    anchorY="middle"
-                >
-                    This is a description for {title}.
-                </Text>
+                <mesh position={[0, 0, 0.11]}>
+                    <Text fontSize={0.1}>
+                        This is a description for {title}.
+                        <motion.meshStandardMaterial
+                            initial={{ opacity: 0 }}
+                            animate={{
+                                opacity: showDescription && isFocused ? 1 : 0,
+                            }}
+                            transition={{ duration: 0.6 }}
+                            color="black"
+                        />
+                    </Text>
+                </mesh>
             </motion.group>
         </group>
     );
 };
-
 export default Tableau;
