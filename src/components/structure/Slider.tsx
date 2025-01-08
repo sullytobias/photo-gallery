@@ -12,7 +12,7 @@ const motionProps = {
     initial: { scale: 0, y: 1 },
     animate: { scale: 1, y: 0 },
     exit: { scale: 0, y: 0 },
-    transition: { type: "spring", stiffness: 180, damping: 12 },
+    transition: { type: "spring", stiffness: 110, damping: 12 },
 };
 
 const glowingDoorAnimation = {
@@ -162,7 +162,7 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
     const handlePrev = () => setCurrentIndex(prevIndex);
 
     return (
-        <motion.group scale={1.6}>
+        <group scale={1.6}>
             {/* Left Navigation */}
             <NavButton
                 position={[-1.3, 0, 0]}
@@ -184,7 +184,7 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
                 title={Galleries[nextIndex].title}
                 direction="right"
             />
-        </motion.group>
+        </group>
     );
 };
 

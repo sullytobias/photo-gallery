@@ -1,4 +1,4 @@
-import { Suspense, useState, useRef } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { CameraControls } from "@react-three/drei";
@@ -19,12 +19,17 @@ import { INITIAL_CAMERA_VIEW, INITIAL_GALLERY_VIEW } from "./const/camera";
 import { setCameraView } from "./components/utils/cameraControls";
 
 import CameraControlsContext from "./context/cameraControls";
+import Loader from "./components/structure/Loader";
 
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");
     const [currentGallery, setCurrentGallery] = useState<GalleryType>(
         Galleries[0]
     );
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {}, []);
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
 
@@ -101,35 +106,43 @@ function App() {
                     ],
                 }}
             >
-                <CameraControlsContext.Provider
-                    value={{ cameraControls: cameraControlsRef.current }}
-                >
-                    <Suspense fallback={null}>
-                        <CameraControls
-                            ref={cameraControlsRef}
-                            makeDefault
-                            truckSpeed={0}
-                            maxDistance={5}
-                            minDistance={5}
-                        />
-
-                        {isMenuView && (
-                            <MainMenu
-                                onEnterGallery={(galleryId) =>
-                                    handleDoorClick(galleryId)
-                                }
+                {isLoading ? (
+                    <Loader
+                        onComplete={(loadingResponse) =>
+                            setIsLoading(loadingResponse)
+                        }
+                    />
+                ) : (
+                    <CameraControlsContext.Provider
+                        value={{ cameraControls: cameraControlsRef.current }}
+                    >
+                        <Suspense fallback={null}>
+                            <CameraControls
+                                ref={cameraControlsRef}
+                                makeDefault
+                                truckSpeed={0}
+                                maxDistance={5}
+                                minDistance={5}
                             />
-                        )}
 
-                        {isGalleryView && (
-                            <Gallery
-                                onSwitchGallery={handleSwitchGallery}
-                                currentGallery={currentGallery}
-                                onBack={handleBackToMenu}
-                            />
-                        )}
-                    </Suspense>
-                </CameraControlsContext.Provider>
+                            {isMenuView && (
+                                <MainMenu
+                                    onEnterGallery={(galleryId) =>
+                                        handleDoorClick(galleryId)
+                                    }
+                                />
+                            )}
+
+                            {isGalleryView && (
+                                <Gallery
+                                    onSwitchGallery={handleSwitchGallery}
+                                    currentGallery={currentGallery}
+                                    onBack={handleBackToMenu}
+                                />
+                            )}
+                        </Suspense>
+                    </CameraControlsContext.Provider>
+                )}
             </Canvas>
         </div>
     );
