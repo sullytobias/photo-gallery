@@ -81,7 +81,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
             <AppDescription
                 textPosition={[0, 0, -2]}
                 onComplete={() => {}}
-                disappearingDuration={3000}
+                disappearingDuration={2000}
                 descriptionLines={DESCRIPTION_GALLERY_LINES(title)}
             />
 

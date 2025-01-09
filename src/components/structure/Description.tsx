@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-
 import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
 
 const FloatingDescription = ({
     lines,
     onComplete,
-    disappearingDuration,
+    disappearingDuration = 1000,
     textPosition,
 }: {
     lines: string[];
@@ -18,53 +17,59 @@ const FloatingDescription = ({
     const [isFadingOut, setIsFadingOut] = useState(false);
 
     useEffect(() => {
-        const timer = setInterval(
-            () =>
-                setVisibleLines((prev) => {
-                    const next = prev + 1;
+        const timer = setInterval(() => {
+            setVisibleLines((prev) => {
+                const next = prev + 1;
 
-                    if (next === lines.length) {
-                        clearInterval(timer);
+                if (next === lines.length) {
+                    clearInterval(timer);
+                    setTimeout(
+                        () => setIsFadingOut(true),
+                        disappearingDuration
+                    );
+                }
 
-                        setTimeout(
-                            () => setIsFadingOut(true),
-                            disappearingDuration
-                        );
-                    }
-
-                    return next;
-                }),
-            800
-        );
+                return next;
+            });
+        }, 800);
 
         return () => clearInterval(timer);
-    }, [disappearingDuration, lines]);
+    }, [lines, disappearingDuration]);
 
     useEffect(() => {
         if (isFadingOut) setTimeout(onComplete, disappearingDuration);
-    }, [disappearingDuration, isFadingOut, onComplete]);
+    }, [isFadingOut, disappearingDuration, onComplete]);
 
     return (
         <group position={textPosition}>
             {lines.slice(0, visibleLines).map((line, index) => (
-                <group key={index}>
+                <motion.group
+                    key={index}
+                    animate={{
+                        y: [-index * 0.4, -index * 0.4 + 0.1, -index * 0.4],
+                    }}
+                    transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                    }}
+                >
                     <Text
                         fontSize={0.2}
                         color="#fff"
                         position={[0, -index * 0.4, 0]}
                     >
                         {line}
-                        <motion.meshStandardMaterial
-                            initial={{
-                                opacity: 0,
+                        <motion.meshBasicMaterial
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: isFadingOut ? 0 : 1 }}
+                            transition={{
+                                duration: disappearingDuration / 1000,
                             }}
-                            animate={{
-                                opacity: isFadingOut ? 0 : 1,
-                            }}
-                            transition={{ duration: 1 }}
                         />
                     </Text>
-                </group>
+                </motion.group>
             ))}
         </group>
     );
@@ -73,7 +78,7 @@ const FloatingDescription = ({
 const AppDescription = ({
     onComplete,
     descriptionLines,
-    disappearingDuration,
+    disappearingDuration = 1000,
     textPosition,
 }: {
     onComplete: (isComplete: boolean) => void;
