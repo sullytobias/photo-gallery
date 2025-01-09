@@ -1,5 +1,3 @@
-import { Environment } from "@react-three/drei";
-
 import Slider from "./Slider";
 
 import { MainMenuProps } from "../../types/mainMenu";
@@ -8,8 +6,6 @@ import GlobalLights from "../lights/global";
 
 const MainMenu = ({ onEnterGallery }: MainMenuProps) => (
     <group>
-        <Environment background preset="night" blur={1} />
-
         <GlobalLights />
 
         <Slider onEnterGallery={onEnterGallery} />
