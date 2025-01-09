@@ -1,45 +1,53 @@
+import { useState, useEffect } from "react";
+
 import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
-import { useState, useEffect } from "react";
 
 const FloatingDescription = ({
     lines,
     onComplete,
+    disappearingDuration,
+    textPosition,
 }: {
     lines: string[];
     onComplete: () => void;
+    disappearingDuration?: number;
+    textPosition: [number, number, number];
 }) => {
     const [visibleLines, setVisibleLines] = useState<number>(0);
     const [isFadingOut, setIsFadingOut] = useState(false);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setVisibleLines((prev) => {
-                const next = prev + 1;
-                if (next === lines.length) {
-                    clearInterval(timer);
+        const timer = setInterval(
+            () =>
+                setVisibleLines((prev) => {
+                    const next = prev + 1;
 
-                    setTimeout(() => {
-                        setIsFadingOut(true);
-                    }, 1000);
-                }
-                return next;
-            });
-        }, 1000);
+                    if (next === lines.length) {
+                        clearInterval(timer);
+
+                        setTimeout(
+                            () => setIsFadingOut(true),
+                            disappearingDuration
+                        );
+                    }
+
+                    return next;
+                }),
+            800
+        );
 
         return () => clearInterval(timer);
-    }, [lines]);
+    }, [disappearingDuration, lines]);
 
     useEffect(() => {
-        if (isFadingOut) {
-            setTimeout(onComplete, 1500);
-        }
-    }, [isFadingOut, onComplete]);
+        if (isFadingOut) setTimeout(onComplete, disappearingDuration);
+    }, [disappearingDuration, isFadingOut, onComplete]);
 
     return (
-        <motion.group position={[0, 2, 2]}>
+        <group position={textPosition}>
             {lines.slice(0, visibleLines).map((line, index) => (
-                <motion.group key={index}>
+                <group key={index}>
                     <Text
                         fontSize={0.2}
                         color="#fff"
@@ -56,31 +64,28 @@ const FloatingDescription = ({
                             transition={{ duration: 1 }}
                         />
                     </Text>
-                </motion.group>
+                </group>
             ))}
-        </motion.group>
+        </group>
     );
 };
 
 const AppDescription = ({
     onComplete,
+    descriptionLines,
+    disappearingDuration,
+    textPosition,
 }: {
     onComplete: (isComplete: boolean) => void;
+    descriptionLines: string[];
+    disappearingDuration?: number;
+    textPosition: [number, number, number];
 }) => {
-    const descriptionLines = [
-        "Bienvenue dans mon projet.",
-        "Explorez une galerie en 3D.",
-        "Chaque détail a été conçu pour l'immersion.",
-        "Cliquez sur les éléments pour découvrir plus.",
-        "Profitez de cette expérience unique.",
-    ];
-
     return (
         <group>
-            <ambientLight intensity={0.5} />
-            <pointLight position={[5, 5, 5]} intensity={1} />
-
             <FloatingDescription
+                textPosition={textPosition}
+                disappearingDuration={disappearingDuration}
                 lines={descriptionLines}
                 onComplete={() => onComplete(true)}
             />

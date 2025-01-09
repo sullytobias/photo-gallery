@@ -18,6 +18,8 @@ import {
 
 import { GalleryProps } from "../../types/galleries";
 import { type TableauType } from "../../types/tableau";
+import AppDescription from "./Description";
+import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
@@ -76,6 +78,13 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     return (
         <group key={id}>
             {/* Gallery Box */}
+            <AppDescription
+                textPosition={[0, 0, -2]}
+                onComplete={() => {}}
+                disappearingDuration={3000}
+                descriptionLines={DESCRIPTION_GALLERY_LINES(title)}
+            />
+
             <mesh>
                 <boxGeometry args={[20, 10, 10]} />
                 <meshStandardMaterial

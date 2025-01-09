@@ -21,6 +21,7 @@ import { setCameraView } from "./components/utils/cameraControls";
 import CameraControlsContext from "./context/cameraControls";
 import Loader from "./components/structure/Loader";
 import AppDescription from "./components/structure/Description";
+import { DESCRIPTION_APP_LINES } from "./const/descriptionLines";
 
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");
@@ -123,6 +124,9 @@ function App() {
 
                             {!isDescriptingCompleted && !isLoading && (
                                 <AppDescription
+                                    textPosition={[0, 2, 2]}
+                                    disappearingDuration={1500}
+                                    descriptionLines={DESCRIPTION_APP_LINES}
                                     onComplete={(isComplete) =>
                                         setIsDescriptingCompleted(isComplete)
                                     }
