@@ -7,6 +7,7 @@ import { Text } from "@react-three/drei";
 import { MainBoxProps, SliderProps } from "../../types/slider";
 
 import { Galleries } from "../../const/galleries";
+import { setCursor } from "../utils/cursor";
 
 const motionProps = {
     initial: { scale: 0, y: 1 },
@@ -36,7 +37,10 @@ const NavButton = ({
     direction: "left" | "right";
 }) => {
     const Arrows = () => (
-        <group>
+        <group
+            onPointerEnter={() => setCursor("pointer")}
+            onPointerLeave={() => setCursor("default")}
+        >
             <mesh
                 position={[direction === "left" ? 0.3 : -0.3, 0, 0]}
                 rotation={[0, 0, Math.PI / 2]}
@@ -125,6 +129,8 @@ const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
 
             {/* Glowing Door */}
             <motion.mesh
+                onPointerEnter={() => setCursor("pointer")}
+                onPointerLeave={() => setCursor("default")}
                 position={[0, -0.2, 0.51]}
                 {...glowingDoorAnimation}
                 onClick={() =>

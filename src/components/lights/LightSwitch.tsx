@@ -1,6 +1,7 @@
 import { motion } from "framer-motion-3d";
 import { useState } from "react";
 import { Box, Text } from "@react-three/drei";
+import { setCursor } from "../utils/cursor";
 
 const WallLightTrigger = ({
     position,
@@ -27,8 +28,10 @@ const WallLightTrigger = ({
             rotation={rotation}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
+            onPointerEnter={() => setCursor("pointer")}
+            onPointerLeave={() => setCursor("default")}
         >
-            <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight} castShadow>
+            <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight}>
                 <motion.meshStandardMaterial
                     animate={{
                         color: isLightOn ? "#555" : "#FFD700",

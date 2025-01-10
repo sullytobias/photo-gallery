@@ -1,21 +1,20 @@
 import { useRef, useState, useEffect } from "react";
-
-import { Mesh } from "three";
-
+import { Mesh, PointLight } from "three";
 import { motion } from "framer-motion-3d";
-
 import { useFrame } from "@react-three/fiber";
-
 import { Environment, Text } from "@react-three/drei";
+import { setCursor } from "../utils/cursor";
 
 const CircularBall = ({
     onBallClick,
     isClickable,
     isFadingOut,
+    lightRef,
 }: {
     onBallClick: () => void;
     isClickable: boolean;
     isFadingOut: boolean;
+    lightRef: React.RefObject<PointLight>;
 }) => {
     const ballRef = useRef<Mesh>(null);
 
@@ -24,15 +23,24 @@ const CircularBall = ({
         const radius = 3;
 
         if (ballRef.current) {
-            ballRef.current.position.x =
-                (radius * Math.cos(elapsedTime * 2)) / 2;
-            ballRef.current.position.z =
-                (radius * Math.sin(elapsedTime * 2)) / 2;
+            const x = (radius * Math.cos(elapsedTime * 2)) / 2;
+            const z = (radius * Math.sin(elapsedTime * 2)) / 2;
+
+            ballRef.current.position.set(x, 0, z);
+
+            if (lightRef.current) {
+                lightRef.current.position.set(x, 2, z);
+            }
         }
     });
 
     return (
-        <mesh ref={ballRef} onClick={isClickable ? onBallClick : undefined}>
+        <mesh
+            onPointerEnter={() => isClickable && setCursor("pointer")}
+            onPointerLeave={() => setCursor("default")}
+            ref={ballRef}
+            onClick={isClickable ? onBallClick : undefined}
+        >
             <sphereGeometry args={[0.5, 32, 32]} />
             <motion.meshStandardMaterial
                 animate={{
@@ -51,8 +59,8 @@ const CircularBall = ({
             >
                 Here
                 <motion.meshStandardMaterial
-                    color="#000"
-                    emissive="#000"
+                    color="#fff"
+                    emissive="#fff"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: !isClickable || isFadingOut ? 0 : 1 }}
                     exit={{ opacity: 0 }}
@@ -69,6 +77,8 @@ const CircularBall = ({
 const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
     const [isClickable, setIsClickable] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
+    const [lightIntensity, setLightIntensity] = useState(0);
+    const lightRef = useRef<PointLight>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -77,6 +87,19 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
 
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        if (isClickable) {
+            let intensity = 0;
+
+            const interval = setInterval(() => {
+                intensity += 0.1;
+                setLightIntensity(intensity);
+
+                if (intensity >= 5.5) clearInterval(interval);
+            }, 50);
+        }
+    }, [isClickable]);
 
     const handleBallClick = () => {
         if (isClickable) {
@@ -89,20 +112,29 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
         }
     };
 
+    useFrame(() => {
+        if (lightRef.current) {
+            lightRef.current.intensity = lightIntensity;
+        }
+    });
+
     return (
         <group>
             {/* Black background */}
             <Environment background preset="night" blur={1} />
 
-            {/* Lighting */}
-            <ambientLight intensity={0.4} />
-            <pointLight position={[10, 10, 10]} intensity={1.0} />
+            <pointLight
+                ref={lightRef}
+                intensity={lightIntensity}
+                color="#fff"
+            />
 
             {/* Circular Ball */}
             <CircularBall
                 onBallClick={handleBallClick}
                 isClickable={isClickable}
                 isFadingOut={isFadingOut}
+                lightRef={lightRef}
             />
 
             {/* Message */}

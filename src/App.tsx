@@ -23,6 +23,8 @@ import Loader from "./components/structure/Loader";
 import AppDescription from "./components/structure/Description";
 import { DESCRIPTION_APP_LINES } from "./const/descriptionLines";
 
+import "./styles/global.scss";
+
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");
     const [currentGallery, setCurrentGallery] = useState<GalleryType>(

@@ -4,6 +4,7 @@ import { type Vector3 } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { TableauProps } from "../../types/tableau";
 import { motion } from "framer-motion-3d";
+import { setCursor } from "../utils/cursor";
 
 const Tableau = ({
     title,
@@ -47,6 +48,8 @@ const Tableau = ({
             onClick={() =>
                 handleClick([position[0], position[1], position[2] + 5])
             }
+            onPointerEnter={() => setCursor("pointer")}
+            onPointerLeave={() => setCursor("default")}
         >
             {/* Frame */}
             <mesh>
