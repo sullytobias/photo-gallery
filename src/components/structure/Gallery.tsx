@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { Text } from "@react-three/drei";
 import { BackSide } from "three";
 
@@ -20,16 +19,16 @@ import { GalleryProps } from "../../types/galleries";
 import { type TableauType } from "../../types/tableau";
 import AppDescription from "./Description";
 import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
+import WallLightTrigger from "../lights/LightSwitch";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
     { title: "Abstract", position: [-3, 3, -4.9] },
-    { title: "Abstract", position: [0, 3, -4.9] },
+    { title: "Mountains", position: [0, 3, -4.9] },
     { title: "Night Sky", position: [3, 3, -4.9] },
     { title: "Seascape", position: [6, 3, -4.9] },
     { title: "Forest Trails", position: [-6, 1, -4.9] },
     { title: "Abstract Colors", position: [-3, 1, -4.9] },
-    { title: "Mountains", position: [0, 1, -4.9] },
     { title: "City Lights", position: [3, 1, -4.9] },
     { title: "Wildlife", position: [6, 1, -4.9] },
     { title: "Vintage Art", position: [-6, -1, -4.9] },
@@ -49,6 +48,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { cameraControls } = useCameraControls();
 
     const [focusedTableau, setFocusedTableau] = useState<number | null>(null);
+    const [lightOn, setLightOn] = useState(false);
 
     const currentIndex = React.useMemo(
         () => Galleries.findIndex((gallery) => gallery.id === id),
@@ -91,12 +91,19 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     color={color}
                     side={BackSide}
                     emissive={color}
-                    emissiveIntensity={0.05}
+                    emissiveIntensity={lightOn ? 0.05 : 0}
                 />
             </mesh>
 
             {/* Lighting */}
-            <GalleryLights />
+            <GalleryLights lightOn={lightOn} />
+
+            <WallLightTrigger
+                position={[0, 1, -4.9]}
+                rotation={[0, 0, 0]}
+                initialLightOn={lightOn}
+                onLightToggle={(isLightOn) => setLightOn(isLightOn)}
+            />
 
             {/* Tableaux */}
             {tableauxData.map(({ title, position, content }, index) => (
