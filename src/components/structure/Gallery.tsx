@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text } from "@react-three/drei";
+import { RoundedBox, Text } from "@react-three/drei";
 import { BackSide } from "three";
 
 import Tableau from "./Tableau";
@@ -20,6 +20,8 @@ import { type TableauType } from "../../types/tableau";
 import AppDescription from "./Description";
 import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
 import WallLightTrigger from "../lights/LightSwitch";
+import { setCursor } from "../utils/cursor";
+import { motion } from "framer-motion-3d";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
@@ -104,6 +106,38 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                 initialLightOn={lightOn}
                 onLightToggle={(isLightOn) => setLightOn(isLightOn)}
             />
+
+            {/* 500px Button */}
+            <motion.group
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+            >
+                <RoundedBox
+                    position={[0, -4.3, -4.5]}
+                    args={[1.2, 0.3, 0.2]}
+                    radius={0.1}
+                    smoothness={4}
+                    onClick={() =>
+                        window.open(
+                            "https://500px.com/p/sullytobias?view=photos",
+                            "_blank"
+                        )
+                    }
+                    onPointerEnter={() => setCursor("pointer")}
+                    onPointerLeave={() => setCursor("default")}
+                >
+                    <meshStandardMaterial color="lightblue" />
+                    <Text
+                        position={[0, 0.1, 0.2]}
+                        fontSize={0.2}
+                        color="black"
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        My 500px
+                    </Text>
+                </RoundedBox>
+            </motion.group>
 
             {/* Tableaux */}
             {tableauxData.map(({ title, position, content }, index) => (

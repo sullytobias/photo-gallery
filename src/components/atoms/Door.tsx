@@ -4,6 +4,7 @@ import { Text } from "@react-three/drei";
 import { BackSide, FrontSide } from "three";
 
 import { DoorPanelType, DoorType, FrameType, TextType } from "../../types/door";
+import { setCursor } from "../utils/cursor";
 
 const Frame = ({ position, args }: FrameType) => (
     <mesh position={position}>
@@ -78,7 +79,10 @@ const Door = ({
     };
 
     return (
-        <group>
+        <group
+            onPointerEnter={() => setCursor("pointer")}
+            onPointerLeave={() => setCursor("default")}
+        >
             <group onClick={handleDoorClick} position={position}>
                 {/* Frame */}
                 <group rotation={rotation}>

@@ -37,10 +37,7 @@ const NavButton = ({
     direction: "left" | "right";
 }) => {
     const Arrows = () => (
-        <group
-            onPointerEnter={() => setCursor("pointer")}
-            onPointerLeave={() => setCursor("default")}
-        >
+        <group>
             <mesh
                 position={[direction === "left" ? 0.3 : -0.3, 0, 0]}
                 rotation={[0, 0, Math.PI / 2]}
@@ -74,6 +71,8 @@ const NavButton = ({
                 initial={{ scale: 0, x: direction === "left" ? -1 : 1 }}
                 animate={{ scale: 1, x: 0 }}
                 exit={{ scale: 0, x: 0 }}
+                onPointerEnter={() => setCursor("pointer")}
+                onPointerLeave={() => setCursor("default")}
             >
                 <Text
                     position={[0, 0.6, 0]}
@@ -127,11 +126,27 @@ const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
                 </mesh>
             </group>
 
+            {/* Door Contour */}
+            <motion.mesh
+                position={[0, -0.2, 0.52]} // Place slightly in front of the door
+                {...glowingDoorAnimation}
+            >
+                <planeGeometry args={[0.5, 0.7]} />
+                {/* Slightly larger than door */}
+                <meshStandardMaterial
+                    color="#00ffff" // Glow color
+                    transparent
+                    opacity={0.5}
+                    emissive="#00ffff"
+                    emissiveIntensity={1}
+                />
+            </motion.mesh>
+
             {/* Glowing Door */}
             <motion.mesh
                 onPointerEnter={() => setCursor("pointer")}
                 onPointerLeave={() => setCursor("default")}
-                position={[0, -0.2, 0.51]}
+                position={[0, -0.2, 0.51]} // Place slightly in front of the wall
                 {...glowingDoorAnimation}
                 onClick={() =>
                     onEnterGalleryHandler(Galleries[currentIndex].id)
