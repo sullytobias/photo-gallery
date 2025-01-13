@@ -1,12 +1,16 @@
-import { Suspense, useState, useRef } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { CameraControls, Environment } from "@react-three/drei";
+
+import { Howl } from "howler";
 
 import { GalleryType } from "./types/galleries";
 
 import MainMenu from "./components/structure/MainMenu";
 import Gallery from "./components/structure/Gallery";
+
+import { useSound } from "./components/utils/hooks/useSound";
 
 import {
     EXIT_DOOR_POSITION,
@@ -35,6 +39,28 @@ function App() {
     const [isDescriptingCompleted, setIsDescriptingCompleted] = useState(false);
 
     const cameraControlsRef = useRef<CameraControls | null>(null);
+
+    const {
+        isBackgroundPlaying,
+        isFxPlaying,
+        toggleBackgroundSound,
+        toggleFxSound,
+    } = useSound();
+
+    useEffect(() => {
+        const ambientWindSound = new Howl({
+            src: ["/sounds/menu.wav"],
+            loop: true,
+            volume: 0.5,
+        });
+
+        if (isBackgroundPlaying) ambientWindSound.play();
+        else ambientWindSound.mute();
+
+        return () => {
+            ambientWindSound.stop();
+        };
+    }, [isBackgroundPlaying]);
 
     const handleBackToMenu = () => {
         const position = EXIT_DOOR_POSITION;
@@ -168,6 +194,43 @@ function App() {
                     }
                 </CameraControlsContext.Provider>
             </Canvas>
+            <button
+                style={{
+                    position: "absolute",
+                    top: "20px",
+                    right: "20px",
+                    padding: "10px 15px",
+                    backgroundColor: isBackgroundPlaying
+                        ? "#4caf50"
+                        : "#f44336",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                }}
+                onClick={toggleBackgroundSound}
+            >
+                {isBackgroundPlaying ? "Sound: On" : "Sound: Off"}
+            </button>
+
+            <button
+                style={{
+                    position: "absolute",
+                    top: "80px",
+                    right: "20px",
+                    padding: "10px 15px",
+                    backgroundColor: isFxPlaying ? "#4caf50" : "#f44336",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                }}
+                onClick={toggleFxSound}
+            >
+                {isFxPlaying ? "Sound: On" : "Sound: Off"}
+            </button>
         </div>
     );
 }

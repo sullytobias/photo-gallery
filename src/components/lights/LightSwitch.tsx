@@ -1,7 +1,9 @@
 import { motion } from "framer-motion-3d";
 import { useState } from "react";
 import { Box, Text } from "@react-three/drei";
+
 import { setCursor } from "../utils/cursor";
+import { uselightSwitchSound } from "../utils/hooks/useLightSwitchSound";
 
 const WallLightTrigger = ({
     position,
@@ -30,6 +32,7 @@ const WallLightTrigger = ({
             whileTap={{ scale: 0.95 }}
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("default")}
+            onClick={() => uselightSwitchSound.play()}
         >
             <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight}>
                 <motion.meshStandardMaterial

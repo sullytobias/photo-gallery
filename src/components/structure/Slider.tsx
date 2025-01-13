@@ -7,7 +7,11 @@ import { Text } from "@react-three/drei";
 import { MainBoxProps, SliderProps } from "../../types/slider";
 
 import { Galleries } from "../../const/galleries";
+
 import { setCursor } from "../utils/cursor";
+
+import { useDoorSound } from "../utils/hooks/useDoorSound";
+import { useSliderSound } from "../utils/hooks/useSliderSound";
 
 const motionProps = {
     initial: { scale: 0, y: 1 },
@@ -96,6 +100,8 @@ const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
     const onEnterGalleryHandler = (id: string) => {
         setIsOpen(true);
         onEnterGallery(id);
+
+        useDoorSound.play();
     };
 
     return (
@@ -179,8 +185,16 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
         [currentIndex]
     );
 
-    const handleNext = () => setCurrentIndex(nextIndex);
-    const handlePrev = () => setCurrentIndex(prevIndex);
+    const handleNext = () => {
+        setCurrentIndex(nextIndex);
+
+        useSliderSound.play();
+    };
+    const handlePrev = () => {
+        setCurrentIndex(prevIndex);
+
+        useSliderSound.play();
+    };
 
     return (
         <group scale={1.6}>

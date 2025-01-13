@@ -17,6 +17,7 @@ const CircularBall = ({
     lightRef: React.RefObject<PointLight>;
 }) => {
     const ballRef = useRef<Mesh>(null);
+    const [isHovered, setIsHovered] = useState(false);
 
     useFrame(({ clock }) => {
         const elapsedTime = clock.getElapsedTime();
@@ -36,8 +37,16 @@ const CircularBall = ({
 
     return (
         <mesh
-            onPointerEnter={() => isClickable && setCursor("pointer")}
-            onPointerLeave={() => setCursor("default")}
+            onPointerEnter={() => {
+                if (isClickable) {
+                    setCursor("pointer");
+                    setIsHovered(true);
+                }
+            }}
+            onPointerLeave={() => {
+                setCursor("default");
+                setIsHovered(false);
+            }}
             ref={ballRef}
             onClick={isClickable ? onBallClick : undefined}
         >
@@ -45,9 +54,15 @@ const CircularBall = ({
             <motion.meshStandardMaterial
                 animate={{
                     opacity: isFadingOut ? 0 : 1,
+                    color: isHovered ? "#ff8800" : "#000", // Glow effect on hover
                 }}
                 transition={{
-                    duration: 1.5,
+                    color: {
+                        duration: 0.3, // Smooth transition for glow
+                    },
+                    opacity: {
+                        duration: 1.5,
+                    },
                 }}
             />
             {/* Text on the Ball */}
@@ -136,20 +151,32 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
                 isFadingOut={isFadingOut}
                 lightRef={lightRef}
             />
-
-            {/* Message */}
-            <Text fontSize={0.3} color="#fff" position={[0, 1.5, 0]}>
-                Enter The Gallery
-                <motion.meshStandardMaterial
-                    color="#fff"
-                    emissive="#fff"
-                    initial={{ opacity: 0 }}
-                    animate={{
-                        opacity: !isClickable || isFadingOut ? 0 : 1,
-                    }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-            </Text>
+            {/* Floating Text */}
+            <motion.group
+                initial={{ y: 1.5 }}
+                animate={{
+                    y: 2,
+                }}
+                transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut",
+                }}
+            >
+                <Text fontSize={0.3} color="#fff">
+                    Enter The Gallery
+                    <motion.meshStandardMaterial
+                        color="#fff"
+                        emissive="#fff"
+                        initial={{ opacity: 0 }}
+                        animate={{
+                            opacity: !isClickable || isFadingOut ? 0 : 1,
+                        }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                    />
+                </Text>
+            </motion.group>
         </group>
     );
 };
