@@ -25,6 +25,7 @@ import WallLightTrigger from "../lights/LightSwitch";
 import { setCursor } from "../utils/cursor";
 import { useSound } from "../utils/hooks/useSound";
 import { usePhotoSound } from "../utils/hooks/usePhotoSound";
+import { usePxSound } from "../utils/hooks/use500pxSound";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
@@ -65,8 +66,11 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const prevGallery =
         Galleries[(currentIndex - 1 + Galleries.length) % Galleries.length];
 
-    const handleTableauClick = (position: [number, number, number]) => {
-        playSound?.(usePhotoSound, true);
+    const handleTableauClick = (
+        position: [number, number, number],
+        sound?: boolean
+    ) => {
+        if (sound) playSound?.(usePhotoSound, true);
 
         if (cameraControls) {
             const offset = 0.1;
@@ -82,6 +86,12 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     };
 
     const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
+
+    const pxClickHandler = () => {
+        window.open("https://500px.com/p/sullytobias?view=photos", "_blank");
+
+        playSound?.(usePxSound, true);
+    };
 
     return (
         <group key={id}>
@@ -123,12 +133,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     args={[1.2, 0.3, 0.2]}
                     radius={0.1}
                     smoothness={4}
-                    onClick={() =>
-                        window.open(
-                            "https://500px.com/p/sullytobias?view=photos",
-                            "_blank"
-                        )
-                    }
+                    onClick={pxClickHandler}
                     onPointerEnter={() => setCursor("pointer")}
                     onPointerLeave={() => setCursor("default")}
                 >

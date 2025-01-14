@@ -1,10 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Text } from "@react-three/drei";
 import { type Vector3 } from "@react-three/fiber";
+
 import { TextureLoader } from "three";
-import { TableauProps } from "../../types/tableau";
+
 import { motion } from "framer-motion-3d";
+
+import { TableauProps } from "../../types/tableau";
+
 import { setCursor } from "../utils/cursor";
+import { usePaperSound } from "../utils/hooks/usePaperSound";
+import { useSound } from "../utils/hooks/useSound";
 
 const Tableau = ({
     title,
@@ -17,6 +24,8 @@ const Tableau = ({
     tableauKey,
 }: TableauProps) => {
     const [showDescription, setShowDescription] = useState(false);
+
+    const { playSound } = useSound();
 
     const textureMap = useMemo(
         () => (texture ? new TextureLoader().load(texture) : undefined),
@@ -31,9 +40,25 @@ const Tableau = ({
         0.1,
     ];
 
-    const toggleDescription = (index: number) => {
+    useEffect(() => {
+        if (!isFocused) setShowDescription(false);
+    }, [isFocused]);
+
+    const toggleDescription = (
+        event: {
+            stopPropagation: () => void;
+        },
+        index: number
+    ) => {
+        event.stopPropagation();
+
         setShowDescription(!showDescription);
+
+        if (!showDescription) playSound?.(usePaperSound, true);
+
         handleEtiquetteClick(index);
+
+        handleClick([position[0], position[1], position[2] + 5]);
     };
 
     const maxTitleLength = 8;
@@ -45,33 +70,39 @@ const Tableau = ({
     return (
         <group
             position={position}
-            onClick={() =>
-                handleClick([position[0], position[1], position[2] + 5])
-            }
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("default")}
         >
             {/* Frame */}
-            <mesh>
-                <boxGeometry
-                    args={[frameSize[0] + 0.1, frameSize[1] + 0.1, 0.1]}
-                />
-                <meshStandardMaterial color="black" />
-            </mesh>
+            <group
+                onClick={() =>
+                    handleClick(
+                        [position[0], position[1], position[2] + 5],
+                        true
+                    )
+                }
+            >
+                <mesh>
+                    <boxGeometry
+                        args={[frameSize[0] + 0.1, frameSize[1] + 0.1, 0.1]}
+                    />
+                    <meshStandardMaterial color="black" />
+                </mesh>
 
-            {/* Content */}
-            <mesh position={contentPosition}>
-                <planeGeometry args={frameSize} />
-                <meshStandardMaterial
-                    map={textureMap}
-                    color={textureMap ? "white" : "gray"}
-                />
-            </mesh>
+                {/* Content */}
+                <mesh position={contentPosition}>
+                    <planeGeometry args={frameSize} />
+                    <meshStandardMaterial
+                        map={textureMap}
+                        color={textureMap ? "white" : "gray"}
+                    />
+                </mesh>
+            </group>
 
             {/* Title */}
             <group
                 position={titlePosition}
-                onClick={() => toggleDescription(tableauKey)}
+                onClick={(event) => toggleDescription(event, tableauKey)}
             >
                 <mesh>
                     <planeGeometry args={[0.5, 0.2]} />

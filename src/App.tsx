@@ -80,6 +80,8 @@ function App() {
         Galleries[0]
     );
 
+    const { playSound } = useSound();
+
     const [isLoading, setIsLoading] = useState(true);
     const [isDescriptingCompleted, setIsDescriptingCompleted] = useState(false);
 
@@ -93,13 +95,9 @@ function App() {
     } = useSound();
 
     useEffect(() => {
-        if (isBackgroundPlaying) useBackgroundSound.play();
+        if (isBackgroundPlaying) playSound?.(useBackgroundSound);
         else useBackgroundSound.pause();
-
-        return () => {
-            useBackgroundSound.stop();
-        };
-    }, [isBackgroundPlaying]);
+    }, [isBackgroundPlaying, playSound]);
 
     const handleBackToMenu = () => {
         const position = EXIT_DOOR_POSITION;

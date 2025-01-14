@@ -3,5 +3,5 @@ export type SoundContextType = {
     isFxPlaying: boolean;
     toggleBackgroundSound: () => void;
     toggleFxSound: () => void;
-    playSound?: (sound: Howl, isFx: boolean) => void;
+    playSound?: (sound: Howl, isFx?: boolean) => void;
 };

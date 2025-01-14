@@ -12,7 +12,7 @@ export const SoundProvider: FC<SoundProviderProps> = ({ children }) => {
     const toggleBackgroundSound = () => setIsBackgroundPlaying((prev) => !prev);
     const toggleFxSound = () => setIsFxPlaying((prev) => !prev);
 
-    const playSound = (sound: Howl, isFx: boolean) => {
+    const playSound = (sound: Howl, isFx?: boolean) => {
         if (isFx && isFxPlaying) sound.play();
         if (!isFx && isBackgroundPlaying) sound.play();
     };

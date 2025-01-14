@@ -10,7 +10,7 @@ export type TableauProps = {
     position: [number, number, number];
     size?: [number, number];
     texture?: string;
-    handleClick: (position: [number, number, number]) => void;
+    handleClick: (position: [number, number, number], sound?: boolean) => void;
     handleEtiquetteClick: (index: number) => void;
     isFocused: boolean;
     tableauKey: number;
