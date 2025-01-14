@@ -189,7 +189,6 @@ function App() {
 
                             {!isDescriptingCompleted && !isLoading && (
                                 <AppDescription
-                                    textPosition={[0, 2, 2]}
                                     disappearingDuration={2000}
                                     descriptionLines={DESCRIPTION_APP_LINES}
                                     onComplete={(isComplete) =>

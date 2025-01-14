@@ -97,7 +97,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
         <group key={id}>
             {/* Gallery Box */}
             <AppDescription
-                textPosition={[0, 0, -2]}
+                textPosition={[0, 0, -4.8]}
                 onComplete={() => {}}
                 disappearingDuration={2000}
                 descriptionLines={DESCRIPTION_GALLERY_LINES(title)}

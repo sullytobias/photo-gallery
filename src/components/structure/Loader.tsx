@@ -26,12 +26,11 @@ const CircularBall = ({
         const radius = 3;
 
         if (ballRef.current) {
-            const x = (radius * Math.cos(elapsedTime * 2)) / 2;
-            const z = (radius * Math.sin(elapsedTime * 2)) / 2;
+            const y = (radius * Math.sin(elapsedTime * 1.02)) / 3;
 
-            ballRef.current.position.set(x, 0, z);
+            ballRef.current.position.set(0, y, 0);
 
-            if (lightRef.current) lightRef.current.position.set(x, 2, z);
+            if (lightRef.current) lightRef.current.position.set(0, y, 0);
         }
     });
 
@@ -54,11 +53,11 @@ const CircularBall = ({
             <motion.meshStandardMaterial
                 animate={{
                     opacity: isFadingOut ? 0 : 1,
-                    color: isHovered ? "#ff8800" : "#000", // Glow effect on hover
+                    color: isHovered ? "#ff8800" : "#000",
                 }}
                 transition={{
                     color: {
-                        duration: 0.3, // Smooth transition for glow
+                        duration: 0.3,
                     },
                     opacity: {
                         duration: 1.5,

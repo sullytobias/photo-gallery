@@ -2,6 +2,23 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
 
+import { useMediaQuery } from "react-responsive";
+
+const useResponsiveStyles = () => {
+    const isSmallScreen = useMediaQuery({ maxWidth: 768 });
+    const isMediumScreen = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
+
+    return {
+        fontSize: isSmallScreen ? 0.25 : isMediumScreen ? 0.4 : 0.5,
+        lineSpacing: isSmallScreen ? 0.4 : isMediumScreen ? 0.6 : 0.8,
+        textPosition: isSmallScreen
+            ? ([0, 1, 0] as [number, number, number])
+            : isMediumScreen
+            ? ([0, 1.3, 0] as [number, number, number])
+            : ([0, 2, 0] as [number, number, number]),
+    };
+};
+
 const FloatingDescription = ({
     lines,
     onComplete,
@@ -11,8 +28,14 @@ const FloatingDescription = ({
     lines: string[];
     onComplete: () => void;
     disappearingDuration?: number;
-    textPosition: [number, number, number];
+    textPosition?: [number, number, number];
 }) => {
+    const {
+        fontSize,
+        lineSpacing,
+        textPosition: responsivePosition,
+    } = useResponsiveStyles();
+
     const [visibleLines, setVisibleLines] = useState<number>(0);
     const [isFadingOut, setIsFadingOut] = useState(false);
 
@@ -41,12 +64,16 @@ const FloatingDescription = ({
     }, [isFadingOut, disappearingDuration, onComplete]);
 
     return (
-        <group position={textPosition}>
+        <group position={textPosition ?? responsivePosition}>
             {lines.slice(0, visibleLines).map((line, index) => (
                 <motion.group
                     key={index}
                     animate={{
-                        y: [-index * 0.4, -index * 0.4 + 0.1, -index * 0.4],
+                        y: [
+                            -index * lineSpacing,
+                            -index * lineSpacing + 0.1,
+                            -index * lineSpacing,
+                        ],
                     }}
                     transition={{
                         duration: 2,
@@ -56,7 +83,7 @@ const FloatingDescription = ({
                     }}
                 >
                     <Text
-                        fontSize={0.2}
+                        fontSize={fontSize}
                         color="#fff"
                         position={[0, -index * 0.4, 0]}
                     >
@@ -84,7 +111,7 @@ const AppDescription = ({
     onComplete: (isComplete: boolean) => void;
     descriptionLines: string[];
     disappearingDuration?: number;
-    textPosition: [number, number, number];
+    textPosition?: [number, number, number];
 }) => {
     return (
         <group>
