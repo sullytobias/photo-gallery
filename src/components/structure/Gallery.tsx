@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { RoundedBox, Text } from "@react-three/drei";
 import { BackSide } from "three";
 
+import { motion } from "framer-motion-3d";
+
 import Tableau from "./Tableau";
 import Door from "../atoms/Door";
-import { useCameraControls } from "../../context/cameraControls";
+import { useCameraControls } from "../utils/context/cameraControls";
 import { setCameraView } from "../utils/cameraControls";
 import GalleryLights from "../lights/gallery";
 
@@ -21,7 +23,8 @@ import AppDescription from "./Description";
 import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
 import WallLightTrigger from "../lights/LightSwitch";
 import { setCursor } from "../utils/cursor";
-import { motion } from "framer-motion-3d";
+import { useSound } from "../utils/hooks/useSound";
+import { usePhotoSound } from "../utils/hooks/usePhotoSound";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
@@ -48,6 +51,7 @@ const tableauxData: TableauType[] = [
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;
     const { cameraControls } = useCameraControls();
+    const { playSound } = useSound();
 
     const [focusedTableau, setFocusedTableau] = useState<number | null>(null);
     const [lightOn, setLightOn] = useState(false);
@@ -62,6 +66,8 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
         Galleries[(currentIndex - 1 + Galleries.length) % Galleries.length];
 
     const handleTableauClick = (position: [number, number, number]) => {
+        playSound?.(usePhotoSound, true);
+
         if (cameraControls) {
             const offset = 0.1;
             setCameraView(cameraControls, {

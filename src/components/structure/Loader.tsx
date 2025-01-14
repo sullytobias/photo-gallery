@@ -4,6 +4,8 @@ import { motion } from "framer-motion-3d";
 import { useFrame } from "@react-three/fiber";
 import { Environment, Text } from "@react-three/drei";
 import { setCursor } from "../utils/cursor";
+import { useSound } from "../utils/hooks/useSound";
+import { useSliderSound } from "../utils/hooks/useSliderSound";
 
 const CircularBall = ({
     onBallClick,
@@ -29,9 +31,7 @@ const CircularBall = ({
 
             ballRef.current.position.set(x, 0, z);
 
-            if (lightRef.current) {
-                lightRef.current.position.set(x, 2, z);
-            }
+            if (lightRef.current) lightRef.current.position.set(x, 2, z);
         }
     });
 
@@ -95,10 +95,10 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
     const [lightIntensity, setLightIntensity] = useState(0);
     const lightRef = useRef<PointLight>(null);
 
+    const { playSound } = useSound();
+
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsClickable(true);
-        }, 3000);
+        const timer = setTimeout(() => setIsClickable(true), 3000);
 
         return () => clearTimeout(timer);
     }, []);
@@ -121,6 +121,8 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
             setIsClickable(false);
             setIsFadingOut(true);
 
+            playSound?.(useSliderSound, true);
+
             setTimeout(() => {
                 isLoading(false);
             }, 1000);
@@ -128,9 +130,7 @@ const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
     };
 
     useFrame(() => {
-        if (lightRef.current) {
-            lightRef.current.intensity = lightIntensity;
-        }
+        if (lightRef.current) lightRef.current.intensity = lightIntensity;
     });
 
     return (

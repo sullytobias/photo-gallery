@@ -1,9 +1,9 @@
 import { useState, FC, ReactNode } from "react";
 import { SoundContext } from "./sound";
 
-interface SoundProviderProps {
+type SoundProviderProps = {
     children: ReactNode;
-}
+};
 
 export const SoundProvider: FC<SoundProviderProps> = ({ children }) => {
     const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(true);
@@ -12,6 +12,11 @@ export const SoundProvider: FC<SoundProviderProps> = ({ children }) => {
     const toggleBackgroundSound = () => setIsBackgroundPlaying((prev) => !prev);
     const toggleFxSound = () => setIsFxPlaying((prev) => !prev);
 
+    const playSound = (sound: Howl, isFx: boolean) => {
+        if (isFx && isFxPlaying) sound.play();
+        if (!isFx && isBackgroundPlaying) sound.play();
+    };
+
     return (
         <SoundContext.Provider
             value={{
@@ -19,6 +24,7 @@ export const SoundProvider: FC<SoundProviderProps> = ({ children }) => {
                 isFxPlaying,
                 toggleBackgroundSound,
                 toggleFxSound,
+                playSound,
             }}
         >
             {children}

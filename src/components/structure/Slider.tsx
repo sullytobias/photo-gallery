@@ -12,6 +12,7 @@ import { setCursor } from "../utils/cursor";
 
 import { useDoorSound } from "../utils/hooks/useDoorSound";
 import { useSliderSound } from "../utils/hooks/useSliderSound";
+import { useSound } from "../utils/hooks/useSound";
 
 const motionProps = {
     initial: { scale: 0, y: 1 },
@@ -94,14 +95,14 @@ const NavButton = ({
     );
 };
 
-const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
+const MainBox = ({ onEnterGallery, currentIndex, playSound }: MainBoxProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const onEnterGalleryHandler = (id: string) => {
         setIsOpen(true);
         onEnterGallery(id);
 
-        useDoorSound.play();
+        playSound?.(useDoorSound, true);
     };
 
     return (
@@ -175,6 +176,8 @@ const MainBox = ({ onEnterGallery, currentIndex }: MainBoxProps) => {
 const Slider = ({ onEnterGallery }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    const { playSound } = useSound();
+
     const nextIndex = useMemo(
         () => (currentIndex + 1) % Galleries.length,
         [currentIndex]
@@ -188,12 +191,12 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
     const handleNext = () => {
         setCurrentIndex(nextIndex);
 
-        useSliderSound.play();
+        playSound?.(useSliderSound, true);
     };
     const handlePrev = () => {
         setCurrentIndex(prevIndex);
 
-        useSliderSound.play();
+        playSound?.(useSliderSound, true);
     };
 
     return (
@@ -208,6 +211,7 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
 
             {/* Main Box */}
             <MainBox
+                playSound={playSound}
                 onEnterGallery={onEnterGallery}
                 currentIndex={currentIndex}
             />

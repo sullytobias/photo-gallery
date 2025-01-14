@@ -4,6 +4,7 @@ import { Box, Text } from "@react-three/drei";
 
 import { setCursor } from "../utils/cursor";
 import { uselightSwitchSound } from "../utils/hooks/useLightSwitchSound";
+import { useSound } from "../utils/hooks/useSound";
 
 const WallLightTrigger = ({
     position,
@@ -18,8 +19,11 @@ const WallLightTrigger = ({
 }) => {
     const [isLightOn, setIsLightOn] = useState(initialLightOn);
 
+    const { playSound } = useSound();
+
     const toggleLight = () => {
         const newLightState = !isLightOn;
+
         setIsLightOn(newLightState);
         onLightToggle(newLightState);
     };
@@ -32,7 +36,7 @@ const WallLightTrigger = ({
             whileTap={{ scale: 0.95 }}
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("default")}
-            onClick={() => uselightSwitchSound.play()}
+            onClick={() => playSound?.(uselightSwitchSound, true)}
         >
             <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight}>
                 <motion.meshStandardMaterial

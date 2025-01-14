@@ -6,6 +6,7 @@ import { BackSide, FrontSide } from "three";
 import { DoorPanelType, DoorType, FrameType, TextType } from "../../types/door";
 import { setCursor } from "../utils/cursor";
 import { useDoorSound } from "../utils/hooks/useDoorSound";
+import { useSound } from "../utils/hooks/useSound";
 
 const Frame = ({ position, args }: FrameType) => (
     <mesh position={position}>
@@ -73,11 +74,12 @@ const Door = ({
     operator,
 }: DoorType) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { playSound } = useSound();
 
     const handleDoorClick = () => {
         setIsOpen(!isOpen);
+        playSound?.(useDoorSound, true);
 
-        useDoorSound.play();
         if (onClick) onClick();
     };
 
