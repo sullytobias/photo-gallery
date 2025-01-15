@@ -1,22 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion-3d";
 import { Text } from "@react-three/drei";
-
 import { useMediaQuery } from "react-responsive";
 
 const useResponsiveStyles = () => {
     const isSmallScreen = useMediaQuery({ maxWidth: 768 });
     const isMediumScreen = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
 
-    return {
-        fontSize: isSmallScreen ? 0.25 : isMediumScreen ? 0.4 : 0.5,
-        lineSpacing: isSmallScreen ? 0.4 : isMediumScreen ? 0.6 : 0.8,
-        textPosition: isSmallScreen
-            ? ([0, 1, 0] as [number, number, number])
-            : isMediumScreen
-            ? ([0, 1.3, 0] as [number, number, number])
-            : ([0, 2, 0] as [number, number, number]),
-    };
+    return useMemo(
+        () => ({
+            fontSize: isSmallScreen ? 0.25 : isMediumScreen ? 0.4 : 0.5,
+            lineSpacing: isSmallScreen ? 0.4 : isMediumScreen ? 0.6 : 0.8,
+            textPosition: isSmallScreen
+                ? ([0, 1, 0] as [number, number, number])
+                : isMediumScreen
+                ? ([0, 1.3, 0] as [number, number, number])
+                : ([0, 2, 0] as [number, number, number]),
+        }),
+        [isSmallScreen, isMediumScreen]
+    );
 };
 
 const FloatingDescription = ({
@@ -35,7 +37,6 @@ const FloatingDescription = ({
         lineSpacing,
         textPosition: responsivePosition,
     } = useResponsiveStyles();
-
     const [visibleLines, setVisibleLines] = useState<number>(0);
     const [isFadingOut, setIsFadingOut] = useState(false);
 
@@ -50,6 +51,7 @@ const FloatingDescription = ({
                         () => setIsFadingOut(true),
                         disappearingDuration
                     );
+                    return next;
                 }
 
                 return next;
@@ -57,10 +59,13 @@ const FloatingDescription = ({
         }, 800);
 
         return () => clearInterval(timer);
-    }, [lines, disappearingDuration]);
+    }, [lines.length, disappearingDuration]);
 
     useEffect(() => {
-        if (isFadingOut) setTimeout(onComplete, disappearingDuration);
+        if (isFadingOut) {
+            const fadeTimeout = setTimeout(onComplete, disappearingDuration);
+            return () => clearTimeout(fadeTimeout);
+        }
     }, [isFadingOut, disappearingDuration, onComplete]);
 
     return (

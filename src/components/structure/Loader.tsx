@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Fragment } from "react";
 import { Mesh, PointLight } from "three";
 import { motion } from "framer-motion-3d";
 import { useFrame } from "@react-three/fiber";
@@ -23,65 +23,50 @@ const CircularBall = ({
 
     useFrame(({ clock }) => {
         const elapsedTime = clock.getElapsedTime();
-        const radius = 3;
+        const y = (3 * Math.sin(elapsedTime * 2)) / 6;
 
-        if (ballRef.current) {
-            const y = (radius * Math.sin(elapsedTime * 1.02)) / 3;
-
-            ballRef.current.position.set(0, y, 0);
-
-            if (lightRef.current) lightRef.current.position.set(0, y, 0);
-        }
+        if (ballRef.current) ballRef.current.position.y = y;
+        if (lightRef.current) lightRef.current.position.y = y;
     });
+
+    const handlePointerEnter = () => {
+        if (isClickable) {
+            setCursor("pointer");
+            setIsHovered(true);
+        }
+    };
+
+    const handlePointerLeave = () => {
+        setCursor("default");
+        setIsHovered(false);
+    };
 
     return (
         <mesh
-            onPointerEnter={() => {
-                if (isClickable) {
-                    setCursor("pointer");
-                    setIsHovered(true);
-                }
-            }}
-            onPointerLeave={() => {
-                setCursor("default");
-                setIsHovered(false);
-            }}
             ref={ballRef}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
             onClick={isClickable ? onBallClick : undefined}
         >
-            <sphereGeometry args={[0.5, 32, 32]} />
+            <sphereGeometry args={[0.8, 32, 32]} />
             <motion.meshStandardMaterial
                 animate={{
                     opacity: isFadingOut ? 0 : 1,
                     color: isHovered ? "#ff8800" : "#000",
                 }}
                 transition={{
-                    color: {
-                        duration: 0.3,
-                    },
-                    opacity: {
-                        duration: 1.5,
-                    },
+                    color: { duration: 0.3 },
+                    opacity: { duration: 1 },
                 }}
             />
-            {/* Text on the Ball */}
-            <Text
-                position={[0, 0.1, 0.5]}
-                fontSize={0.2}
-                anchorX="center"
-                anchorY="middle"
-            >
-                Here
+            <Text position={[0, 0.3, 0.8]} letterSpacing={0.3} fontSize={0.3}>
+                Enter
                 <motion.meshStandardMaterial
                     color="#fff"
                     emissive="#fff"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: !isClickable || isFadingOut ? 0 : 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{
-                        duration: 1.5,
-                        ease: "easeInOut",
-                    }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
                 />
             </Text>
         </mesh>
@@ -91,92 +76,45 @@ const CircularBall = ({
 const Loader = ({ isLoading }: { isLoading: (response: boolean) => void }) => {
     const [isClickable, setIsClickable] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
-    const [lightIntensity, setLightIntensity] = useState(0);
     const lightRef = useRef<PointLight>(null);
-
     const { playSound } = useSound();
 
     useEffect(() => {
         const timer = setTimeout(() => setIsClickable(true), 3000);
-
         return () => clearTimeout(timer);
     }, []);
 
-    useEffect(() => {
-        if (isClickable) {
-            let intensity = 0;
-
-            const interval = setInterval(() => {
-                intensity += 0.1;
-                setLightIntensity(intensity);
-
-                if (intensity >= 5.5) clearInterval(interval);
-            }, 50);
-        }
-    }, [isClickable]);
-
     const handleBallClick = () => {
-        if (isClickable) {
-            setIsClickable(false);
-            setIsFadingOut(true);
+        if (!isClickable) return;
+        setIsClickable(false);
+        setIsFadingOut(true);
 
-            playSound?.(useSliderSound, true);
+        playSound?.(useSliderSound, true);
 
-            setTimeout(() => {
-                isLoading(false);
-            }, 1000);
-        }
+        setTimeout(() => isLoading(false), 1000);
     };
 
-    useFrame(() => {
-        if (lightRef.current) lightRef.current.intensity = lightIntensity;
+    useFrame(({ clock }) => {
+        if (lightRef.current) {
+            const maxIntensity = 5.5;
+            const intensity = isClickable
+                ? Math.min(clock.elapsedTime * 1.5, maxIntensity)
+                : 0;
+            lightRef.current.intensity = intensity;
+        }
     });
 
     return (
-        <group>
-            {/* Black background */}
+        <Fragment>
             <Environment background preset="night" blur={1} />
-
-            <pointLight
-                ref={lightRef}
-                intensity={lightIntensity}
-                color="#fff"
-            />
-
-            {/* Circular Ball */}
+            <pointLight ref={lightRef} intensity={0} color="#fff" />
             <CircularBall
                 onBallClick={handleBallClick}
                 isClickable={isClickable}
                 isFadingOut={isFadingOut}
                 lightRef={lightRef}
             />
-            {/* Floating Text */}
-            <motion.group
-                initial={{ y: 1.5 }}
-                animate={{
-                    y: 2,
-                }}
-                transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                }}
-            >
-                <Text fontSize={0.3} color="#fff">
-                    Enter The Gallery
-                    <motion.meshStandardMaterial
-                        color="#fff"
-                        emissive="#fff"
-                        initial={{ opacity: 0 }}
-                        animate={{
-                            opacity: !isClickable || isFadingOut ? 0 : 1,
-                        }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                    />
-                </Text>
-            </motion.group>
-        </group>
+        </Fragment>
     );
 };
 

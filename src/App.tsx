@@ -1,4 +1,4 @@
-import { Suspense, useState, useRef, useEffect, Fragment } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { CameraControls, Environment } from "@react-three/drei";
@@ -21,58 +21,16 @@ import { INITIAL_CAMERA_VIEW, INITIAL_GALLERY_VIEW } from "./const/camera";
 import { setCameraView } from "./components/utils/cameraControls";
 
 import CameraControlsContext from "./components/utils/context/cameraControls";
+import { useBackgroundSound } from "./components/utils/hooks/useBackgroundSound";
+
 import Loader from "./components/structure/Loader";
 import AppDescription from "./components/structure/Description";
+
 import { DESCRIPTION_APP_LINES } from "./const/descriptionLines";
 
+import SoundElements from "./components/atoms/SoundsButtons";
+
 import "./styles/global.scss";
-import { useBackgroundSound } from "./components/utils/hooks/useBackgroundSound";
-import { SoundContextType } from "./types/soundContext";
-
-const SoundElements = ({
-    isBackgroundPlaying,
-    toggleBackgroundSound,
-    isFxPlaying,
-    toggleFxSound,
-}: SoundContextType) => (
-    <Fragment>
-        <button
-            style={{
-                position: "absolute",
-                top: "20px",
-                right: "20px",
-                padding: "10px 15px",
-                backgroundColor: isBackgroundPlaying ? "#4caf50" : "#f44336",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "16px",
-            }}
-            onClick={toggleBackgroundSound}
-        >
-            {isBackgroundPlaying ? "Music: On" : "Music: Off"}
-        </button>
-
-        <button
-            style={{
-                position: "absolute",
-                top: "80px",
-                right: "20px",
-                padding: "10px 15px",
-                backgroundColor: isFxPlaying ? "#4caf50" : "#f44336",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "16px",
-            }}
-            onClick={toggleFxSound}
-        >
-            {isFxPlaying ? "Fx: On" : "Fx: Off"}
-        </button>
-    </Fragment>
-);
 
 function App() {
     const [view, setView] = useState<"menu" | "gallery">("menu");

@@ -13,6 +13,7 @@ import { setCursor } from "../utils/cursor";
 import { useDoorSound } from "../utils/hooks/useDoorSound";
 import { useSliderSound } from "../utils/hooks/useSliderSound";
 import { useSound } from "../utils/hooks/useSound";
+import { useMediaQuery } from "react-responsive";
 
 const motionProps = {
     initial: { scale: 0, y: 1 },
@@ -49,13 +50,13 @@ const DragMesh = (visible: boolean) => (
 );
 
 const DragIcon = ({ visible }: { visible: boolean }) => (
-    <group position={[0, -1, 1]}>
-        <Text fontSize={0.15} color="#fff" position={[0, 0.4, 0]}>
+    <group position={[0, 1.3, 0]}>
+        <Text fontSize={0.1} color="#fff" position={[0, 0.3, 0]}>
             Drag to Move
             {DragMesh(visible)}
         </Text>
         <mesh>
-            <circleGeometry args={[0.15, 32]} />
+            <circleGeometry args={[0.1, 32]} />
             {DragMesh(visible)}
         </mesh>
     </group>
@@ -97,8 +98,8 @@ const NavButton = ({
 
     return (
         <motion.group
-            scale={0.6}
-            position={position}
+            scale={0.8}
+            position={position.map((p) => p) as [number, number, number]}
             whileHover={{ scale: 0.7 }}
             onClick={onClick}
         >
@@ -165,14 +166,11 @@ const MainBox = ({ onEnterGallery, currentIndex, playSound }: MainBoxProps) => {
             </group>
 
             {/* Door Contour */}
-            <motion.mesh
-                position={[0, -0.2, 0.52]} // Place slightly in front of the door
-                {...glowingDoorAnimation}
-            >
+            <motion.mesh position={[0, -0.2, 0.52]} {...glowingDoorAnimation}>
                 <planeGeometry args={[0.5, 0.7]} />
                 {/* Slightly larger than door */}
                 <meshStandardMaterial
-                    color="#00ffff" // Glow color
+                    color="#00ffff"
                     transparent
                     opacity={0.5}
                     emissive="#00ffff"
@@ -208,6 +206,11 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [hasDragged, setHasDragged] = useState(false);
 
+    const isSmallScreen = useMediaQuery({ maxWidth: 768 });
+    const isMediumScreen = useMediaQuery({ maxWidth: 1024 });
+
+    const scale = isSmallScreen ? 1 : isMediumScreen ? 1.2 : 1.4;
+
     const handleDragStart = () => setHasDragged(true);
 
     const { playSound } = useSound();
@@ -227,6 +230,7 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
 
         playSound?.(useSliderSound, true);
     };
+
     const handlePrev = () => {
         setCurrentIndex(prevIndex);
 
@@ -234,20 +238,16 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
     };
 
     useEffect(() => {
-        // Add a global event listener to the canvas
         window.addEventListener("pointerdown", handleDragStart);
-
         return () => {
             window.removeEventListener("pointerdown", handleDragStart);
         };
     }, []);
 
     return (
-        <group scale={1.6}>
-            {/* Drag Icon */}
+        <group scale={scale}>
             <DragIcon visible={!hasDragged} />
 
-            {/* Left Navigation */}
             <NavButton
                 position={[-1.3, 0, 0]}
                 onClick={handlePrev}
@@ -255,14 +255,12 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
                 direction="left"
             />
 
-            {/* Main Box */}
             <MainBox
                 playSound={playSound}
                 onEnterGallery={onEnterGallery}
                 currentIndex={currentIndex}
             />
 
-            {/* Right Navigation */}
             <NavButton
                 position={[1.3, 0, 0]}
                 onClick={handleNext}

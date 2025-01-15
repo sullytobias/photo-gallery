@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import { RoundedBox, Text } from "@react-three/drei";
 import { BackSide } from "three";
-
 import { motion } from "framer-motion-3d";
 
 import Tableau from "./Tableau";
@@ -9,6 +8,11 @@ import Door from "../atoms/Door";
 import { useCameraControls } from "../utils/context/cameraControls";
 import { setCameraView } from "../utils/cameraControls";
 import GalleryLights from "../lights/gallery";
+import WallLightTrigger from "../lights/LightSwitch";
+import { setCursor } from "../utils/cursor";
+import { useSound } from "../utils/hooks/useSound";
+import { usePhotoSound } from "../utils/hooks/usePhotoSound";
+import { usePxSound } from "../utils/hooks/use500pxSound";
 
 import {
     EXIT_DOOR_POSITION,
@@ -16,35 +20,18 @@ import {
     NEXT_DOOR_POSITION,
     PREV_DOOR_POSITION,
 } from "../../const/galleries";
-
 import { GalleryProps } from "../../types/galleries";
-import { type TableauType } from "../../types/tableau";
+import { TableauType } from "../../types/tableau";
 import AppDescription from "./Description";
 import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
-import WallLightTrigger from "../lights/LightSwitch";
-import { setCursor } from "../utils/cursor";
-import { useSound } from "../utils/hooks/useSound";
-import { usePhotoSound } from "../utils/hooks/usePhotoSound";
-import { usePxSound } from "../utils/hooks/use500pxSound";
 
 const tableauxData: TableauType[] = [
     { title: "Abstract", position: [-6, 3, -4.9] },
-    { title: "Abstract", position: [-3, 3, -4.9] },
     { title: "Mountains", position: [0, 3, -4.9] },
-    { title: "Night Sky", position: [3, 3, -4.9] },
-    { title: "Seascape", position: [6, 3, -4.9] },
+    { title: "Night Sky", position: [4, 3, -4.9] },
     { title: "Forest Trails", position: [-6, 1, -4.9] },
-    { title: "Abstract Colors", position: [-3, 1, -4.9] },
     { title: "City Lights", position: [3, 1, -4.9] },
-    { title: "Wildlife", position: [6, 1, -4.9] },
-    { title: "Vintage Art", position: [-6, -1, -4.9] },
-    { title: "Ocean Depths", position: [-3, -1, -4.9] },
-    { title: "Autumn Leaves", position: [0, -1, -4.9] },
-    { title: "Desert Sands", position: [3, -1, -4.9] },
-    { title: "Rainforest", position: [6, -1, -4.9] },
-    { title: "Evening Glow", position: [-6, -3, -4.9] },
-    { title: "Snow Peaks", position: [-3, -3, -4.9] },
-    { title: "River Flow", position: [0, -3, -4.9] },
+    { title: "Ocean Depths", position: [-3, -3, -4.9] },
     { title: "Cherry Blossoms", position: [3, -3, -4.9] },
     { title: "Starry Night", position: [6, -3, -4.9] },
 ];
@@ -57,27 +44,32 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const [focusedTableau, setFocusedTableau] = useState<number | null>(null);
     const [lightOn, setLightOn] = useState(false);
 
-    const currentIndex = React.useMemo(
+    const currentIndex = useMemo(
         () => Galleries.findIndex((gallery) => gallery.id === id),
         [id]
     );
 
-    const nextGallery = Galleries[(currentIndex + 1) % Galleries.length];
-    const prevGallery =
-        Galleries[(currentIndex - 1 + Galleries.length) % Galleries.length];
+    const nextGallery = useMemo(
+        () => Galleries[(currentIndex + 1) % Galleries.length],
+        [currentIndex]
+    );
+
+    const prevGallery = useMemo(
+        () =>
+            Galleries[(currentIndex - 1 + Galleries.length) % Galleries.length],
+        [currentIndex]
+    );
 
     const handleTableauClick = (
         position: [number, number, number],
         sound?: boolean
     ) => {
         if (sound) playSound?.(usePhotoSound, true);
-
         if (cameraControls) {
-            const offset = 0.1;
             setCameraView(cameraControls, {
                 positionX: position[0],
                 positionY: position[1],
-                positionZ: position[2] + offset,
+                positionZ: position[2] + 0.1,
                 targetX: position[0],
                 targetY: position[1],
                 targetZ: position[2],
@@ -85,24 +77,26 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
         }
     };
 
-    const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
-
-    const pxClickHandler = () => {
+    const handle500pxClick = () => {
         window.open("https://500px.com/p/sullytobias?view=photos", "_blank");
-
         playSound?.(usePxSound, true);
     };
 
+    const handleLightToggle = (isLightOn: boolean) => setLightOn(isLightOn);
+
+    const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
+
     return (
         <group key={id}>
-            {/* Gallery Box */}
+            {/* Gallery Description */}
             <AppDescription
-                textPosition={[0, 0, -4.8]}
                 onComplete={() => {}}
+                textPosition={[0, 0, -4.8]}
                 disappearingDuration={2000}
                 descriptionLines={DESCRIPTION_GALLERY_LINES(title)}
             />
 
+            {/* Gallery Box */}
             <mesh>
                 <boxGeometry args={[20, 10, 10]} />
                 <meshStandardMaterial
@@ -113,14 +107,14 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                 />
             </mesh>
 
-            {/* Lighting */}
+            {/* Gallery Lights */}
             <GalleryLights lightOn={lightOn} />
 
+            {/* Wall Light Toggle */}
             <WallLightTrigger
                 position={[0, 1, -4.9]}
-                rotation={[0, 0, 0]}
                 initialLightOn={lightOn}
-                onLightToggle={(isLightOn) => setLightOn(isLightOn)}
+                onLightToggle={handleLightToggle}
             />
 
             {/* 500px Button */}
@@ -133,30 +127,22 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     args={[1.2, 0.3, 0.2]}
                     radius={0.1}
                     smoothness={4}
-                    onClick={pxClickHandler}
+                    onClick={handle500pxClick}
                     onPointerEnter={() => setCursor("pointer")}
                     onPointerLeave={() => setCursor("default")}
                 >
                     <meshStandardMaterial color="lightblue" />
-                    <Text
-                        position={[0, 0.1, 0.2]}
-                        fontSize={0.2}
-                        color="black"
-                        anchorX="center"
-                        anchorY="middle"
-                    >
+                    <Text position={[0, 0.1, 0.2]} fontSize={0.2} color="black">
                         My 500px
                     </Text>
                 </RoundedBox>
             </motion.group>
 
             {/* Tableaux */}
-            {tableauxData.map(({ title, position, content }, index) => (
+            {tableauxData.map((data, index) => (
                 <Tableau
                     key={index}
-                    title={title}
-                    texture={content}
-                    position={position}
+                    {...data}
                     handleClick={handleTableauClick}
                     handleEtiquetteClick={handleEtiquetteClick}
                     isFocused={focusedTableau === index}
@@ -169,8 +155,6 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                 position={[0, 4.5, 0]}
                 fontSize={0.5}
                 color="white"
-                anchorX="center"
-                anchorY="middle"
                 rotation={[Math.PI / 2, 0, 0]}
             >
                 {title || "GALLERY"}
