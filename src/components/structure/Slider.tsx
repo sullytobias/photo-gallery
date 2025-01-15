@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import { motion } from "framer-motion-3d";
 
@@ -29,6 +29,37 @@ const glowingDoorAnimation = {
         ease: "easeInOut",
     },
 };
+
+const DragIconAnimation = (visible: boolean) => ({
+    initial: { opacity: 1, scale: 1 },
+    animate: visible ? { opacity: 1, scale: 1.2 } : { opacity: 0, scale: 0.5 },
+    exit: { opacity: 0, scale: 0.5 },
+    transition: {
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.5 },
+    },
+});
+
+const DragMesh = (visible: boolean) => (
+    <motion.meshStandardMaterial
+        color="#00ffff"
+        transparent
+        {...DragIconAnimation(visible)}
+    />
+);
+
+const DragIcon = ({ visible }: { visible: boolean }) => (
+    <group position={[0, -1, 1]}>
+        <Text fontSize={0.15} color="#fff" position={[0, 0.4, 0]}>
+            Drag to Move
+            {DragMesh(visible)}
+        </Text>
+        <mesh>
+            <circleGeometry args={[0.15, 32]} />
+            {DragMesh(visible)}
+        </mesh>
+    </group>
+);
 
 const NavButton = ({
     position,
@@ -153,7 +184,7 @@ const MainBox = ({ onEnterGallery, currentIndex, playSound }: MainBoxProps) => {
             <motion.mesh
                 onPointerEnter={() => setCursor("pointer")}
                 onPointerLeave={() => setCursor("default")}
-                position={[0, -0.2, 0.51]} // Place slightly in front of the wall
+                position={[0, -0.2, 0.51]}
                 {...glowingDoorAnimation}
                 onClick={() =>
                     onEnterGalleryHandler(Galleries[currentIndex].id)
@@ -175,6 +206,9 @@ const MainBox = ({ onEnterGallery, currentIndex, playSound }: MainBoxProps) => {
 
 const Slider = ({ onEnterGallery }: SliderProps) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [hasDragged, setHasDragged] = useState(false);
+
+    const handleDragStart = () => setHasDragged(true);
 
     const { playSound } = useSound();
 
@@ -199,8 +233,20 @@ const Slider = ({ onEnterGallery }: SliderProps) => {
         playSound?.(useSliderSound, true);
     };
 
+    useEffect(() => {
+        // Add a global event listener to the canvas
+        window.addEventListener("pointerdown", handleDragStart);
+
+        return () => {
+            window.removeEventListener("pointerdown", handleDragStart);
+        };
+    }, []);
+
     return (
         <group scale={1.6}>
+            {/* Drag Icon */}
+            <DragIcon visible={!hasDragged} />
+
             {/* Left Navigation */}
             <NavButton
                 position={[-1.3, 0, 0]}
