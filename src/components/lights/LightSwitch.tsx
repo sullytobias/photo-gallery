@@ -7,8 +7,8 @@ import { uselightSwitchSound } from "../utils/hooks/useLightSwitchSound";
 import { useSound } from "../utils/hooks/useSound";
 
 const WallLightTrigger = ({
-    position,
-    rotation,
+    position = [0, 0, 0],
+    rotation = [0, 0, 0],
     initialLightOn = true,
     onLightToggle,
 }: {
@@ -18,14 +18,13 @@ const WallLightTrigger = ({
     onLightToggle: (isLightOn: boolean) => void;
 }) => {
     const [isLightOn, setIsLightOn] = useState(initialLightOn);
-
     const { playSound } = useSound();
 
     const toggleLight = () => {
         const newLightState = !isLightOn;
-
         setIsLightOn(newLightState);
         onLightToggle(newLightState);
+        playSound?.(uselightSwitchSound, true);
     };
 
     return (
@@ -36,13 +35,11 @@ const WallLightTrigger = ({
             whileTap={{ scale: 0.95 }}
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("grab")}
-            onClick={() => playSound?.(uselightSwitchSound, true)}
+            onClick={toggleLight}
         >
-            <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight}>
+            <Box args={[0.6, 0.6, 0.1]}>
                 <motion.meshStandardMaterial
-                    animate={{
-                        color: isLightOn ? "#555" : "#FFD700",
-                    }}
+                    animate={{ color: isLightOn ? "#555" : "#FFD700" }}
                     transition={{ duration: 0.3 }}
                 />
             </Box>

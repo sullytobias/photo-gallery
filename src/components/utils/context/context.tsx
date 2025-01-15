@@ -1,9 +1,6 @@
-import { useState, FC, ReactNode } from "react";
+import { useState, FC } from "react";
 import { SoundContext } from "./sound";
-
-type SoundProviderProps = {
-    children: ReactNode;
-};
+import { SoundProviderProps } from "../../../types/soundContext";
 
 export const SoundProvider: FC<SoundProviderProps> = ({ children }) => {
     const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(true);

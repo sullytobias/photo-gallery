@@ -1,14 +1,24 @@
 const GalleryLights = ({ lightOn }: { lightOn: boolean }) => {
-    return lightOn ? (
+    const positions: [number, number, number][] = lightOn
+        ? [
+              [0, 0, 0],
+              [-5, 0, 0],
+              [5, 0, 0],
+          ]
+        : [[0, 1.5, -4]];
+    const intensity = lightOn ? 30 : 5;
+
+    return (
         <>
-            {/* Point lights for general illumination */}
-            <pointLight position={[0, 0, 0]} intensity={30} />
-            <pointLight position={[-5, 0, 0]} intensity={30} />
-            <pointLight position={[5, 0, 0]} intensity={30} />
+            {positions.map((position, index) => (
+                <pointLight
+                    key={index}
+                    position={position}
+                    intensity={intensity}
+                />
+            ))}
         </>
-    ) : (
-        <pointLight position={[0, 1.5, -4]} intensity={5} />
     );
-}
+};
 
 export default GalleryLights;

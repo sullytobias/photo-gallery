@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Text } from "@react-three/drei";
-import { type Vector3 } from "@react-three/fiber";
+import { ThreeEvent, type Vector3 } from "@react-three/fiber";
 
 import { TextureLoader } from "three";
 
@@ -24,7 +24,6 @@ const Tableau = ({
     tableauKey,
 }: TableauProps) => {
     const [showDescription, setShowDescription] = useState(false);
-
     const { playSound } = useSound();
 
     const textureMap = useMemo(
@@ -33,7 +32,6 @@ const Tableau = ({
     );
 
     const frameSize = size;
-    const contentPosition: Vector3 = [0, 0, 0.06];
     const titlePosition: Vector3 = [
         size[0] / 2 - 0.25,
         -size[1] / 2 + 0.1,
@@ -45,27 +43,25 @@ const Tableau = ({
     }, [isFocused]);
 
     const toggleDescription = (
-        event: {
-            stopPropagation: () => void;
-        },
+        event: ThreeEvent<MouseEvent>,
         index: number
     ) => {
         event.stopPropagation();
+        const newShowDescription = !showDescription;
 
-        setShowDescription(!showDescription);
-
-        if (!showDescription) playSound?.(usePaperSound, true);
+        setShowDescription(newShowDescription);
+        if (newShowDescription) playSound?.(usePaperSound, true);
 
         handleEtiquetteClick(index);
-
         handleClick([position[0], position[1], position[2] + 5]);
     };
 
-    const maxTitleLength = 8;
     const truncatedTitle =
-        title.length > maxTitleLength
-            ? `${title.substring(0, maxTitleLength)}...`
-            : title;
+        title.length > 8 ? `${title.substring(0, 8)}...` : title;
+
+    const handleFrameClick = () => {
+        handleClick([position[0], position[1], position[2] + 5], true);
+    };
 
     return (
         <group
@@ -74,14 +70,7 @@ const Tableau = ({
             onPointerLeave={() => setCursor("grab")}
         >
             {/* Frame */}
-            <group
-                onClick={() =>
-                    handleClick(
-                        [position[0], position[1], position[2] + 5],
-                        true
-                    )
-                }
-            >
+            <group onClick={handleFrameClick}>
                 <mesh>
                     <boxGeometry
                         args={[frameSize[0] + 0.1, frameSize[1] + 0.1, 0.1]}
@@ -90,7 +79,7 @@ const Tableau = ({
                 </mesh>
 
                 {/* Content */}
-                <mesh position={contentPosition}>
+                <mesh position={[0, 0, 0.06]}>
                     <planeGeometry args={frameSize} />
                     <meshStandardMaterial
                         map={textureMap}
@@ -120,34 +109,35 @@ const Tableau = ({
             </group>
 
             {/* Description */}
-            <motion.group>
-                <mesh position={[0, 0, 0.1]}>
-                    <planeGeometry args={frameSize} />
-                    <motion.meshStandardMaterial
-                        initial={{ opacity: 0 }}
-                        animate={{
-                            opacity: showDescription && isFocused ? 0.7 : 0,
-                        }}
-                        transition={{ duration: 0.6 }}
-                        color="wheat"
-                        transparent
-                    />
-                </mesh>
-                <mesh position={[0, 0, 0.11]}>
-                    <Text fontSize={0.1}>
-                        This is a description for {title}.
+            {isFocused && (
+                <motion.group>
+                    <mesh position={[0, 0, 0.1]}>
+                        <planeGeometry args={frameSize} />
                         <motion.meshStandardMaterial
                             initial={{ opacity: 0 }}
-                            animate={{
-                                opacity: showDescription && isFocused ? 1 : 0,
-                            }}
+                            animate={{ opacity: showDescription ? 0.7 : 0 }}
                             transition={{ duration: 0.6 }}
-                            color="black"
+                            color="wheat"
+                            transparent
                         />
-                    </Text>
-                </mesh>
-            </motion.group>
+                    </mesh>
+                    <mesh position={[0, 0, 0.11]}>
+                        <Text fontSize={0.1}>
+                            This is a description for {title}.
+                            <motion.meshStandardMaterial
+                                initial={{ opacity: 0 }}
+                                animate={{
+                                    opacity: showDescription ? 1 : 0,
+                                }}
+                                transition={{ duration: 0.6 }}
+                                color="black"
+                            />
+                        </Text>
+                    </mesh>
+                </motion.group>
+            )}
         </group>
     );
 };
+
 export default Tableau;

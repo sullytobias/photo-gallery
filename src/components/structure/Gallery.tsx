@@ -5,14 +5,19 @@ import { motion } from "framer-motion-3d";
 
 import Tableau from "./Tableau";
 import Door from "../atoms/Door";
+
 import { useCameraControls } from "../utils/context/cameraControls";
 import { setCameraView } from "../utils/cameraControls";
+
 import GalleryLights from "../lights/gallery";
 import WallLightTrigger from "../lights/LightSwitch";
+
 import { setCursor } from "../utils/cursor";
 import { useSound } from "../utils/hooks/useSound";
 import { usePhotoSound } from "../utils/hooks/usePhotoSound";
 import { usePxSound } from "../utils/hooks/use500pxSound";
+
+import { tableauxData } from "../../data/tableaux";
 
 import {
     EXIT_DOOR_POSITION,
@@ -20,21 +25,12 @@ import {
     NEXT_DOOR_POSITION,
     PREV_DOOR_POSITION,
 } from "../../const/galleries";
-import { GalleryProps } from "../../types/galleries";
-import { TableauType } from "../../types/tableau";
-import AppDescription from "./Description";
+
 import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
 
-const tableauxData: TableauType[] = [
-    { title: "Abstract", position: [-6, 3, -4.9] },
-    { title: "Mountains", position: [0, 3, -4.9] },
-    { title: "Night Sky", position: [4, 3, -4.9] },
-    { title: "Forest Trails", position: [-6, 1, -4.9] },
-    { title: "City Lights", position: [3, 1, -4.9] },
-    { title: "Ocean Depths", position: [-3, -3, -4.9] },
-    { title: "Cherry Blossoms", position: [3, -3, -4.9] },
-    { title: "Starry Night", position: [6, -3, -4.9] },
-];
+import { GalleryProps } from "../../types/galleries";
+
+import AppDescription from "./Description";
 
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion-3d";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Text } from "@react-three/drei";
 import { BackSide, FrontSide } from "three";
 
@@ -15,20 +15,20 @@ const Frame = ({ position, args }: FrameType) => (
     </mesh>
 );
 
-const DoorPanel = ({ isFrontSide, isOpen, rotation }: DoorPanelType) => (
-    <mesh rotation={rotation}>
-        <planeGeometry args={[2.1, 4.1]} />
-        <motion.meshStandardMaterial
-            animate={{
-                color: isOpen ? "#000" : "#fff",
-            }}
-            transition={{
-                duration: 0.8,
-            }}
-            side={isFrontSide ? FrontSide : BackSide}
-        />
-    </mesh>
-);
+const DoorPanel = ({ isFrontSide, isOpen, rotation }: DoorPanelType) => {
+    const panelColor = useMemo(() => (isOpen ? "#000" : "#fff"), [isOpen]);
+
+    return (
+        <mesh rotation={rotation}>
+            <planeGeometry args={[2.1, 4.1]} />
+            <motion.meshStandardMaterial
+                animate={{ color: panelColor }}
+                transition={{ duration: 0.8 }}
+                side={isFrontSide ? FrontSide : BackSide}
+            />
+        </mesh>
+    );
+};
 
 const DoorText = ({
     text,
@@ -37,31 +37,39 @@ const DoorText = ({
     operator,
     rotation,
     isOpen,
-}: TextType) => (
-    <Text
-        position={[
-            placeTextWithZAxis
-                ? position[0]
-                : operator === "+"
-                ? position[0] + 0.1
-                : position[0] - 0.1,
-            position[1],
-            placeTextWithZAxis ? position[2] - 0.1 : position[2],
-        ]}
-        rotation={rotation && [rotation[0], -rotation[1], rotation[2]]}
-        fontSize={0.3}
-    >
-        {text}
+}: TextType) => {
+    const calculatedPosition = useMemo(
+        () =>
+            [
+                placeTextWithZAxis
+                    ? position[0]
+                    : position[0] + (operator === "+" ? 0.1 : -0.1),
+                position[1],
+                placeTextWithZAxis ? position[2] - 0.1 : position[2],
+            ] as [number, number, number],
+        [placeTextWithZAxis, position, operator]
+    );
 
-        <motion.meshStandardMaterial
-            animate={{
-                opacity: isOpen ? 0 : 1,
-            }}
-            transition={{ duration: 0.8 }}
-            color="black"
-        />
-    </Text>
-);
+    const textRotation = useMemo(
+        () => (rotation ? [rotation[0], -rotation[1], rotation[2]] : undefined),
+        [rotation]
+    ) as [number, number, number];
+
+    return (
+        <Text
+            position={calculatedPosition}
+            rotation={textRotation}
+            fontSize={0.3}
+        >
+            {text}
+            <motion.meshStandardMaterial
+                animate={{ opacity: isOpen ? 0 : 1 }}
+                transition={{ duration: 0.8 }}
+                color="black"
+            />
+        </Text>
+    );
+};
 
 const Door = ({
     position,
@@ -77,10 +85,9 @@ const Door = ({
     const { playSound } = useSound();
 
     const handleDoorClick = () => {
-        setIsOpen(!isOpen);
+        setIsOpen((prev) => !prev);
         playSound?.(useDoorSound, true);
-
-        if (onClick) onClick();
+        onClick?.();
     };
 
     return (
@@ -88,15 +95,14 @@ const Door = ({
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("grab")}
         >
+            {/* Door and Frame */}
             <group onClick={handleDoorClick} position={position}>
-                {/* Frame */}
                 <group rotation={rotation}>
                     <Frame position={[0, 2.1, 0.05]} args={[2.3, 0.1, 0.1]} />
                     <Frame position={[-1.1, 0, 0.05]} args={[0.1, 4.2, 0.1]} />
                     <Frame position={[1.1, 0, 0.05]} args={[0.1, 4.2, 0.1]} />
                 </group>
 
-                {/* Door Panel */}
                 <motion.group>
                     <DoorPanel
                         isOpen={isOpen}
@@ -107,7 +113,7 @@ const Door = ({
                 </motion.group>
             </group>
 
-            {/* Text */}
+            {/* Door Text */}
             {text && (
                 <DoorText
                     isOpen={isOpen}

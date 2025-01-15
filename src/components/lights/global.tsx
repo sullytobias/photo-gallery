@@ -7,28 +7,29 @@ const GlobalLights = () => {
 
     useFrame(({ clock }) => {
         const time = clock.getElapsedTime();
+        const light = directionalLightRef.current;
 
-        if (directionalLightRef.current) {
+        if (light) {
             const radius = 15;
-            directionalLightRef.current.position.x = Math.cos(time) * radius;
-            directionalLightRef.current.position.z = Math.sin(time) * radius;
-            directionalLightRef.current.position.y =
-                Math.sin(time * 0.5) * 10 + 10;
-
-            directionalLightRef.current.target.position.set(0, 0, 0);
-            directionalLightRef.current.target.updateMatrixWorld();
+            light.position.set(
+                Math.cos(time) * radius,
+                Math.sin(time * 0.5) * 10 + 10,
+                Math.sin(time) * radius
+            );
+            light.target.position.set(0, 0, 0);
+            light.target.updateMatrixWorld();
         }
     });
 
     return (
-        <group>
+        <>
             <ambientLight intensity={1} />
             <directionalLight
                 ref={directionalLightRef}
                 intensity={3}
                 color="white"
             />
-        </group>
+        </>
     );
 };
 

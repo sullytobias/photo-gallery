@@ -1,9 +1,5 @@
 import { createContext, useContext } from "react";
-import { CameraControls } from "@react-three/drei";
-
-interface CameraControlsContextType {
-    cameraControls: CameraControls | null;
-}
+import { CameraControlsContextType } from "../../../types/cameraControl";
 
 const CameraControlsContext = createContext<CameraControlsContextType>({
     cameraControls: null,
