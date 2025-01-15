@@ -35,7 +35,7 @@ const WallLightTrigger = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onPointerEnter={() => setCursor("pointer")}
-            onPointerLeave={() => setCursor("default")}
+            onPointerLeave={() => setCursor("grab")}
             onClick={() => playSound?.(uselightSwitchSound, true)}
         >
             <Box args={[0.6, 0.6, 0.1]} onClick={toggleLight}>

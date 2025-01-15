@@ -71,7 +71,7 @@ const Tableau = ({
         <group
             position={position}
             onPointerEnter={() => setCursor("pointer")}
-            onPointerLeave={() => setCursor("default")}
+            onPointerLeave={() => setCursor("grab")}
         >
             {/* Frame */}
             <group

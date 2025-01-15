@@ -86,7 +86,7 @@ const Door = ({
     return (
         <group
             onPointerEnter={() => setCursor("pointer")}
-            onPointerLeave={() => setCursor("default")}
+            onPointerLeave={() => setCursor("grab")}
         >
             <group onClick={handleDoorClick} position={position}>
                 {/* Frame */}

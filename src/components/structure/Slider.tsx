@@ -109,7 +109,7 @@ const NavButton = ({
                 animate={{ scale: 1, x: 0 }}
                 exit={{ scale: 0, x: 0 }}
                 onPointerEnter={() => setCursor("pointer")}
-                onPointerLeave={() => setCursor("default")}
+                onPointerLeave={() => setCursor("grab")}
             >
                 <Text
                     position={[0, 0.6, 0]}
@@ -181,7 +181,7 @@ const MainBox = ({ onEnterGallery, currentIndex, playSound }: MainBoxProps) => {
             {/* Glowing Door */}
             <motion.mesh
                 onPointerEnter={() => setCursor("pointer")}
-                onPointerLeave={() => setCursor("default")}
+                onPointerLeave={() => setCursor("grab")}
                 position={[0, -0.2, 0.51]}
                 {...glowingDoorAnimation}
                 onClick={() =>

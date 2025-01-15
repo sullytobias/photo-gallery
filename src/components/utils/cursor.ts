@@ -1,4 +1,4 @@
-export const setCursor = (state: "pointer" | "default") => {
+export const setCursor = (state: "pointer" | "grab") => {
     document.body.classList.toggle("cursor-pointer", state === "pointer");
-    document.body.classList.toggle("cursor-default", state === "default");
+    document.body.classList.toggle("cursor-grab", state === "grab");
 };

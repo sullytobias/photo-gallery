@@ -37,7 +37,7 @@ const CircularBall = ({
     };
 
     const handlePointerLeave = () => {
-        setCursor("default");
+        setCursor("grab");
         setIsHovered(false);
     };
 

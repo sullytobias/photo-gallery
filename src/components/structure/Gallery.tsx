@@ -129,7 +129,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     smoothness={4}
                     onClick={handle500pxClick}
                     onPointerEnter={() => setCursor("pointer")}
-                    onPointerLeave={() => setCursor("default")}
+                    onPointerLeave={() => setCursor("grab")}
                 >
                     <meshStandardMaterial color="lightblue" />
                     <Text position={[0, 0.1, 0.2]} fontSize={0.2} color="black">

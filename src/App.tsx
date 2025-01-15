@@ -120,7 +120,12 @@ function App() {
     const isMenuView = view === "menu";
 
     return (
-        <div style={{ height: "100vh", width: "100vw" }}>
+        <div
+            style={{
+                height: "100vh",
+                width: "100vw",
+            }}
+        >
             <Canvas
                 camera={{
                     position: [
