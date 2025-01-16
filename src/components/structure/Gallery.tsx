@@ -79,7 +79,6 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     };
 
     const handleLightToggle = (isLightOn: boolean) => setLightOn(isLightOn);
-
     const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
 
     return (

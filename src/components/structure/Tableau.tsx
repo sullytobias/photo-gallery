@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text } from "@react-three/drei";
 import { ThreeEvent, useLoader, type Vector3 } from "@react-three/fiber";
 import { TextureLoader } from "three";
@@ -63,9 +63,8 @@ const Tableau = ({
     const truncatedTitle =
         title.length > 8 ? `${title.substring(0, 8)}...` : title;
 
-    const handleFrameClick = () => {
+    const handleFrameClick = () =>
         handleClick([position[0], position[1], position[2] + 5], true);
-    };
 
     return (
         <group
@@ -88,19 +87,15 @@ const Tableau = ({
                 </mesh>
 
                 {/* Content */}
-                <Suspense
-                    fallback={
-                        <mesh position={[0, 0, 0.06]}>
-                            <planeGeometry args={adjustedSize} />
-                            <meshStandardMaterial color="lightgray" />
-                        </mesh>
-                    }
-                >
-                    <mesh position={[0, 0, 0.06]}>
-                        <planeGeometry args={adjustedSize} />
+
+                <mesh position={[0, 0, 0.06]}>
+                    <planeGeometry args={adjustedSize} />
+                    {textureMap ? (
                         <meshStandardMaterial map={textureMap} color="white" />
-                    </mesh>
-                </Suspense>
+                    ) : (
+                        <meshStandardMaterial color="black" />
+                    )}
+                </mesh>
             </group>
 
             {/* Title */}
