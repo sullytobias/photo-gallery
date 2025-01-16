@@ -135,7 +135,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
             </motion.group>
 
             {/* Tableaux */}
-            {tableauxData.map((data, index) => (
+            {tableauxData[id].map((data, index) => (
                 <Tableau
                     key={index}
                     {...data}

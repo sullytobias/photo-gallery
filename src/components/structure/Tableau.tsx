@@ -1,14 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-
+import { Suspense, useEffect, useState } from "react";
 import { Text } from "@react-three/drei";
-import { ThreeEvent, type Vector3 } from "@react-three/fiber";
-
+import { ThreeEvent, useLoader, type Vector3 } from "@react-three/fiber";
 import { TextureLoader } from "three";
-
 import { motion } from "framer-motion-3d";
-
 import { TableauProps } from "../../types/tableau";
-
 import { setCursor } from "../utils/cursor";
 import { usePaperSound } from "../utils/hooks/usePaperSound";
 import { useSound } from "../utils/hooks/useSound";
@@ -26,10 +21,8 @@ const Tableau = ({
     const [showDescription, setShowDescription] = useState(false);
     const { playSound } = useSound();
 
-    const textureMap = useMemo(
-        () => (texture ? new TextureLoader().load(texture) : undefined),
-        [texture]
-    );
+    // Load texture asynchronously
+    const textureMap = useLoader(TextureLoader, texture ?? "");
 
     const frameSize = size;
     const titlePosition: Vector3 = [
@@ -79,13 +72,19 @@ const Tableau = ({
                 </mesh>
 
                 {/* Content */}
-                <mesh position={[0, 0, 0.06]}>
-                    <planeGeometry args={frameSize} />
-                    <meshStandardMaterial
-                        map={textureMap}
-                        color={textureMap ? "white" : "gray"}
-                    />
-                </mesh>
+                <Suspense
+                    fallback={
+                        <mesh position={[0, 0, 0.06]}>
+                            <planeGeometry args={frameSize} />
+                            <meshStandardMaterial color="lightgray" />
+                        </mesh>
+                    }
+                >
+                    <mesh position={[0, 0, 0.06]}>
+                        <planeGeometry args={frameSize} />
+                        <meshStandardMaterial map={textureMap} color="white" />
+                    </mesh>
+                </Suspense>
             </group>
 
             {/* Title */}
