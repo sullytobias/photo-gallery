@@ -1,4 +1,8 @@
-export type GalleryType = { title: string; id: string; color: string };
+export type GalleryType = {
+    title: string;
+    id: "macro" | "urbex" | "architecture" | "people" | "animals";
+    color: string;
+};
 
 export type GalleriesType = GalleryType[];
 

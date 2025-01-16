@@ -59,7 +59,7 @@ const DoorText = ({
         <Text
             position={calculatedPosition}
             rotation={textRotation}
-            fontSize={0.3}
+            fontSize={0.2}
         >
             {text}
             <motion.meshStandardMaterial

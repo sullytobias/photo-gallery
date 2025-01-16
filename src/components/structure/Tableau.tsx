@@ -10,6 +10,7 @@ import { useSound } from "../utils/hooks/useSound";
 
 const Tableau = ({
     title,
+    description,
     position,
     size = [2.5, 1.5],
     texture,
@@ -19,15 +20,25 @@ const Tableau = ({
     tableauKey,
 }: TableauProps) => {
     const [showDescription, setShowDescription] = useState(false);
+    const [adjustedSize, setAdjustedSize] = useState(size);
     const { playSound } = useSound();
 
-    // Load texture asynchronously
     const textureMap = useLoader(TextureLoader, texture ?? "");
 
-    const frameSize = size;
+    useEffect(() => {
+        if (textureMap.image) {
+            const { width, height } = textureMap.image;
+            const aspectRatio = width / height;
+
+            if (aspectRatio > 1)
+                setAdjustedSize([size[0], size[0] / aspectRatio]);
+            else setAdjustedSize([size[1] * aspectRatio, size[1]]);
+        }
+    }, [textureMap, size]);
+
     const titlePosition: Vector3 = [
-        size[0] / 2 - 0.25,
-        -size[1] / 2 + 0.1,
+        adjustedSize[0] / 2 - 0.25,
+        -adjustedSize[1] / 2 + 0.1,
         0.1,
     ];
 
@@ -58,6 +69,7 @@ const Tableau = ({
 
     return (
         <group
+            scale={1.3}
             position={position}
             onPointerEnter={() => setCursor("pointer")}
             onPointerLeave={() => setCursor("grab")}
@@ -66,7 +78,11 @@ const Tableau = ({
             <group onClick={handleFrameClick}>
                 <mesh>
                     <boxGeometry
-                        args={[frameSize[0] + 0.1, frameSize[1] + 0.1, 0.1]}
+                        args={[
+                            adjustedSize[0] + 0.1,
+                            adjustedSize[1] + 0.1,
+                            0.1,
+                        ]}
                     />
                     <meshStandardMaterial color="black" />
                 </mesh>
@@ -75,13 +91,13 @@ const Tableau = ({
                 <Suspense
                     fallback={
                         <mesh position={[0, 0, 0.06]}>
-                            <planeGeometry args={frameSize} />
+                            <planeGeometry args={adjustedSize} />
                             <meshStandardMaterial color="lightgray" />
                         </mesh>
                     }
                 >
                     <mesh position={[0, 0, 0.06]}>
-                        <planeGeometry args={frameSize} />
+                        <planeGeometry args={adjustedSize} />
                         <meshStandardMaterial map={textureMap} color="white" />
                     </mesh>
                 </Suspense>
@@ -108,10 +124,11 @@ const Tableau = ({
             </group>
 
             {/* Description */}
-            {isFocused && (
-                <motion.group>
+            {isFocused && description && (
+                <group>
+                    {/* Background Plane for Description */}
                     <mesh position={[0, 0, 0.1]}>
-                        <planeGeometry args={frameSize} />
+                        <planeGeometry args={adjustedSize} />
                         <motion.meshStandardMaterial
                             initial={{ opacity: 0 }}
                             animate={{ opacity: showDescription ? 0.7 : 0 }}
@@ -120,20 +137,48 @@ const Tableau = ({
                             transparent
                         />
                     </mesh>
-                    <mesh position={[0, 0, 0.11]}>
-                        <Text fontSize={0.1}>
-                            This is a description for {title}.
+
+                    {/* Title Text */}
+                    <mesh position={[0, adjustedSize[1] / 2 - 0.15, 0.11]}>
+                        <Text
+                            fontSize={0.15}
+                            color="black"
+                            anchorX="center"
+                            anchorY="top"
+                            maxWidth={adjustedSize[0] - 0.2}
+                        >
+                            {title}
                             <motion.meshStandardMaterial
                                 initial={{ opacity: 0 }}
-                                animate={{
-                                    opacity: showDescription ? 1 : 0,
-                                }}
+                                animate={{ opacity: showDescription ? 1 : 0 }}
                                 transition={{ duration: 0.6 }}
                                 color="black"
+                                transparent
                             />
                         </Text>
                     </mesh>
-                </motion.group>
+
+                    {/* Description Text */}
+                    <mesh position={[0, 0, 0.11]}>
+                        <Text
+                            fontSize={0.1}
+                            color="black"
+                            anchorX="center"
+                            anchorY="top"
+                            maxWidth={adjustedSize[0] - 0.2}
+                            lineHeight={1.2}
+                        >
+                            {description}
+                            <motion.meshStandardMaterial
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: showDescription ? 1 : 0 }}
+                                transition={{ duration: 0.6 }}
+                                color="black"
+                                transparent
+                            />
+                        </Text>
+                    </mesh>
+                </group>
             )}
         </group>
     );
