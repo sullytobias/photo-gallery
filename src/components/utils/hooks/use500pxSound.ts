@@ -1,7 +1,7 @@
 import { Howl } from "howler";
 
 const pxSound = new Howl({
-    src: ["/sounds/500px.wav"],
+    src: [`${import.meta.env.BASE_URL}/sounds/500px.wav`],
     volume: 0.5,
 });
 

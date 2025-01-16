@@ -1,7 +1,7 @@
 import { Howl } from "howler";
 
 const sliderSound = new Howl({
-    src: ["/sounds/slider.wav"],
+    src: [`${import.meta.env.BASE_URL}/sounds/slider.wav`],
     volume: 0.2,
 });
 

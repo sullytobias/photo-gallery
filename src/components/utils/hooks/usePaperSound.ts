@@ -1,7 +1,7 @@
 import { Howl } from "howler";
 
 const paperSound = new Howl({
-    src: ["/sounds/paper.wav"],
+    src: [`${import.meta.env.BASE_URL}/sounds/paper.wav`],
     volume: 0.4,
 });
 
