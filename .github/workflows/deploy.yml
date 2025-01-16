@@ -3,16 +3,12 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+      - main 
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,8 +24,19 @@ jobs:
       - name: Build project
         run: yarn build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+      - name: Deploy to gh-pages
+        run: |
+          # Initialize a new Git repository in the build output folder
+          cd dist  # Make sure this path matches your build output folder
+          git init
+          
+          # Set GitHub Actions as the user
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add and commit changes
+          git add .
+          git commit -m "Deploy to gh-pages"
+
+          # Push to gh-pages branch using the PAT
+          git push --force "https://${{ secrets.GH_TOKEN }}@github.com/sullytobias/photo-gallery.git" HEAD:gh-pages
