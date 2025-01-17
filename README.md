@@ -1,4 +1,4 @@
-# **Project Name**
+# **Photo Gallery**
 
 ## Description
 This project is designed to showcase interactive tableaux with dynamic textures and descriptions. It utilizes React, Three.js, and Framer Motion for smooth animations and interactions. 
@@ -38,4 +38,4 @@ This project is designed to showcase interactive tableaux with dynamic textures 
 ## 🔧 **Installation**
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/project-name.git
+   git clone https://github.com/your-repo/photo-gallery.git
