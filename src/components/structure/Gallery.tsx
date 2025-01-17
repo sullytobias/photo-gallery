@@ -109,7 +109,7 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const handleEtiquetteClick = (index: number) => setFocusedTableau(index);
 
     return (
-        <group key={id}>
+        <group key={id + currentIndex}>
             {/* Gallery Description */}
             <AppDescription
                 onComplete={() => {}}
@@ -157,9 +157,11 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
             </motion.group>
             {/* Tableaux */}
             {tableauxData[id].map((data, index) => (
-                <Suspense fallback={<TableauLoader position={data.position} />}>
+                <Suspense
+                    key={index + data.title}
+                    fallback={<TableauLoader position={data.position} />}
+                >
                     <Tableau
-                        key={index + data.title}
                         {...data}
                         handleClick={handleTableauClick}
                         handleEtiquetteClick={handleEtiquetteClick}
