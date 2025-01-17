@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { RoundedBox, Text } from "@react-three/drei";
+import { useState, useMemo, Suspense } from "react";
+import { Html, RoundedBox, Text } from "@react-three/drei";
 import { BackSide } from "three";
 import { motion } from "framer-motion-3d";
 
@@ -31,6 +31,33 @@ import { DESCRIPTION_GALLERY_LINES } from "../../const/descriptionLines";
 import { GalleryProps } from "../../types/galleries";
 
 import AppDescription from "./Description";
+
+function TableauLoader({ position }: { position: [number, number, number] }) {
+    return (
+        <group position={position}>
+            <Html center>
+                <div
+                    style={{
+                        width: "40px",
+                        height: "40px",
+                        border: "4px solid #fff",
+                        borderTop: "4px solid transparent",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                    }}
+                />
+                <style>
+                    {`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}
+                </style>
+            </Html>
+        </group>
+    );
+}
 
 const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
     const { color, title, id } = currentGallery;
@@ -90,7 +117,6 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                 disappearingDuration={2000}
                 descriptionLines={DESCRIPTION_GALLERY_LINES(title)}
             />
-
             {/* Gallery Box */}
             <mesh>
                 <boxGeometry args={[20, 10, 10]} />
@@ -101,17 +127,14 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     emissiveIntensity={lightOn ? 0.05 : 0}
                 />
             </mesh>
-
             {/* Gallery Lights */}
             <GalleryLights lightOn={lightOn} />
-
             {/* Wall Light Toggle */}
             <WallLightTrigger
                 position={[0, 1, -4.9]}
                 initialLightOn={lightOn}
                 onLightToggle={handleLightToggle}
             />
-
             {/* 500px Button */}
             <motion.group
                 whileHover={{ scale: 1.1 }}
@@ -132,19 +155,19 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
                     </Text>
                 </RoundedBox>
             </motion.group>
-
             {/* Tableaux */}
             {tableauxData[id].map((data, index) => (
-                <Tableau
-                    key={index}
-                    {...data}
-                    handleClick={handleTableauClick}
-                    handleEtiquetteClick={handleEtiquetteClick}
-                    isFocused={focusedTableau === index}
-                    tableauKey={index}
-                />
+                <Suspense fallback={<TableauLoader position={data.position} />}>
+                    <Tableau
+                        key={index + data.title}
+                        {...data}
+                        handleClick={handleTableauClick}
+                        handleEtiquetteClick={handleEtiquetteClick}
+                        isFocused={focusedTableau === index}
+                        tableauKey={index}
+                    />
+                </Suspense>
             ))}
-
             {/* Gallery Title */}
             <Text
                 position={[0, 4.5, 0]}
@@ -154,7 +177,6 @@ const Gallery = ({ currentGallery, onBack, onSwitchGallery }: GalleryProps) => {
             >
                 {title || "GALLERY"}
             </Text>
-
             {/* Navigation Doors */}
             <group>
                 <Door

@@ -87,14 +87,9 @@ const Tableau = ({
                 </mesh>
 
                 {/* Content */}
-
                 <mesh position={[0, 0, 0.06]}>
                     <planeGeometry args={adjustedSize} />
-                    {textureMap ? (
-                        <meshStandardMaterial map={textureMap} color="white" />
-                    ) : (
-                        <meshStandardMaterial color="black" />
-                    )}
+                    <meshStandardMaterial map={textureMap} />
                 </mesh>
             </group>
 
